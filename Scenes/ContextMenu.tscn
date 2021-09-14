@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/ContextMenu.cs" type="Script" id=1]
+
+[node name="ContextMenu" type="PopupMenu"]
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[connection signal="about_to_show" from="." to="." method="_on_ContextMenu_about_to_show"]
+[connection signal="id_pressed" from="." to="." method="_on_ContextMenu_id_pressed"]
+[connection signal="popup_hide" from="." to="." method="_on_ContextMenu_popup_hide"]
+[connection signal="visibility_changed" from="." to="." method="_on_ContextMenu_visibility_changed"]
