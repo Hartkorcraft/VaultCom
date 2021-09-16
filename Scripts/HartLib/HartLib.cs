@@ -84,6 +84,12 @@ namespace HartLib
         {
             return input.Split(new[] { "\r\n", "\r", "\n" }, StringSplitOptions.None);
         }
+
+        public static List<string> DivideStringIntoLinesList(string input)
+        {
+            return new List<string>(input.Split(','));
+        }
+
         public static string NewLine { get { return "\r\n"; } }
 
         //* Godot stuff  

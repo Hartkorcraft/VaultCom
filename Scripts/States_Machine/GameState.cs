@@ -14,7 +14,7 @@ public abstract class GameState
     {
         get
         {
-            if (game_manager != null) { return allowWorldInput && !game_manager.ContextMenuOpen; }
+            if (game_manager != null) { return allowWorldInput && !game_manager.DebugConsoleOpen && !game_manager.ContextMenuOpen; }
             return allowWorldInput;
         }
         set { allowWorldInput = value; }

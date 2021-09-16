@@ -8,7 +8,7 @@ public class Debug_Manager : Control
 {
 
     Label debugInfoLabel;
-    DebugConsole debugConsole;
+    public DebugConsole debugConsole { get; private set;}
     /// Use AddLog, DeleteLog, UpdateLog and ClearLogs()
     Dictionary<string, DebugInfo> logs = new Dictionary<string, DebugInfo>();
     string debugText = "";
@@ -26,7 +26,7 @@ public class Debug_Manager : Control
         if (inputEvent.IsActionPressed("Toggle_Debug_Menu"))
         { debugConsole.Visible = !debugConsole.Visible; }
     }
-    
+
     public void AddLog(DebugInfo log)
     {
         logs.Add(log.Name, log);

@@ -6,10 +6,12 @@ public class DebugConsole : Control
 
     TextEdit outputBox;
     LineEdit inputBox;
+    ConsoleCommandsManager consoleManager;
 
     public override void _EnterTree()
     {
         base._EnterTree();
+        consoleManager = new ConsoleCommandsManager(this);
         outputBox = (TextEdit)GetNode("Output");
         inputBox = (LineEdit)GetNode("Input");
     }
@@ -29,7 +31,9 @@ public class DebugConsole : Control
     {
         inputBox.Clear();
         if (new_text.Length == 0) { return; }
+
         OutputText(new_text);
+        consoleManager.HandleInput(new_text);
         outputBox.CursorSetLine(outputBox.GetLineCount());
     }
 }
