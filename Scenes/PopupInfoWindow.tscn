@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://Scripts/Popups/PopupInfoWindow.cs" type="Script" id=1]
+
+[node name="PopupInfoWindow" type="WindowDialog"]
+margin_left = 128.0
+margin_top = 112.0
+margin_right = 416.0
+margin_bottom = 240.0
+window_title = "Sex"
+script = ExtResource( 1 )
+
+[connection signal="mouse_entered" from="." to="." method="_on_PopupInfoWindow_mouse_entered"]
+[connection signal="mouse_exited" from="." to="." method="_on_PopupInfoWindow_mouse_exited"]
+[connection signal="popup_hide" from="." to="." method="_on_PopupInfoWindow_popup_hide"]

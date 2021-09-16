@@ -9,6 +9,11 @@ public class ContextMenu : PopupMenu
 
     //public bool Showing { get; set; } = false;
     List<IContextable> iContextChoices = new List<IContextable>();
+
+    uint closing_time;
+
+    public uint TimeAfterClosing { get { return OS.GetTicksMsec() - closing_time; } }
+    public bool SafeInput { get { return TimeAfterClosing > 2; } }
     public override void _Ready()
     {
 
@@ -18,7 +23,6 @@ public class ContextMenu : PopupMenu
     {
         if (inputEvent.IsActionPressed("Right_Mouse") && Main.game_Manager.AllowWorldInput)
         {
-            //GD.Print(Main.game_Manager.Previous_State);
             //Main.game_Manager.SetState(new ContextSelectionState());
             var mouse_pos = GetGlobalMousePosition();
             var mouse_grid_pos = Main.Mouse_Grid_Pos;
@@ -56,7 +60,7 @@ public class ContextMenu : PopupMenu
         }
         SetAsMinsize();
     }
-    
+
     private List<IContextable> Get_Context_Objects(Vector2i mouse_grid_pos)
     {
         var collider_dicts = Main.Get_Collider_Dicts_From_GridPos(mouse_grid_pos);
@@ -79,19 +83,24 @@ public class ContextMenu : PopupMenu
 
         if (id >= 0 && id < iContextChoices.Count)
         {
-            iContextChoices[id]?.Act_On_Context_Selection();
+            iContextChoices[id]?.Act_On_Context_Selection(this);
         }
 
         switch (id)
         {
             case 999:
                 GD.Print("Closed!");
-                Visible = false;
+                Close();
                 break;
             default:
                 //GD.PushWarning("No switch option!");
                 break;
         }
+    }
+
+    public void Close()
+    {
+        Visible = false;
     }
     public void _on_ContextMenu_about_to_show()
     {
@@ -99,7 +108,8 @@ public class ContextMenu : PopupMenu
     }
     public void _on_ContextMenu_popup_hide()
     {
-
+        closing_time = OS.GetTicksMsec();
+        // GD.Print("HIddent!");
     }
 
     public void _on_ContextMenu_visibility_changed()

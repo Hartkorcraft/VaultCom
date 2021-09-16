@@ -1,9 +1,13 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://Scripts/Debug_Manager.cs" type="Script" id=1]
+[ext_resource path="res://Scenes/DebugConsole.tscn" type="PackedScene" id=2]
 
-[node name="Debug_Manager" type="Node2D"]
+[node name="Debug_Manager" type="Control"]
 script = ExtResource( 1 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="DebugInfoLabel" type="Label" parent="."]
 margin_right = 40.0
@@ -11,3 +15,8 @@ margin_bottom = 14.0
 __meta__ = {
 "_edit_use_anchors_": false
 }
+
+[node name="DebugConsole" parent="." instance=ExtResource( 2 )]
+visible = false
+
+[editable path="DebugConsole"]

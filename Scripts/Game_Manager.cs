@@ -9,6 +9,10 @@ public class Game_Manager : Node2D
     public GameState Current_State { get; private set; }
     public GameState Previous_State { get; private set; }
     public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
+    public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
+    public bool AllowWorldInput { get { return Current_State.AllowWorldInput; } }
+    public HashSet<ITurnable> PlayerTurnObjects { get; } = new HashSet<ITurnable>();
+    public HashSet<ITurnable> NpcTurnObjects { get; } = new HashSet<ITurnable>();
 
     public void SetState(GameState new_game_state)
     {
@@ -20,25 +24,6 @@ public class Game_Manager : Node2D
 
     }
 
-    //End sprite move transition and return to previous state
-    public void EndSpriteMapObjectTransition()
-    {
-        if (Current_State is TransitionState)
-        {
-            SetState(Previous_State);
-            Main.map.PathfindingTiles.Clear();
-        }
-        else { throw new Exception("Not transitioning?!"); }
-    }
-
-    public bool AllowWorldInput
-    {
-        get
-        {
-            return Current_State.AllowWorldInput;
-        }
-    }
-
     #region SELECTION
 
     private ISelectable currentSelection;
@@ -48,7 +33,9 @@ public class Game_Manager : Node2D
         set
         {
             if (Current_State.AllowWorldInput is false) { return; };
+            CurrentSelection?.HandleBeingUnselected();
             currentSelection = value;
+            CurrentSelection?.HandleBeingSelected();
 
             string name = Helpers.NameAndType(currentSelection as INameable);
             if (value is null) { name = "null"; }
@@ -60,7 +47,8 @@ public class Game_Manager : Node2D
 
     public void Select(ISelectable selection, bool unSelectIfSame = false)
     {
-        Current_State.Select(selection, unSelectIfSame);
+        if (CurrentSelection == selection && unSelectIfSame) { selection = null; }
+        CurrentSelection = selection;
     }
 
     #endregion
@@ -101,4 +89,29 @@ public class Game_Manager : Node2D
         Current_State.UpdateState();
     }
     #endregion
+
+    public void _on_Next_Turn_Button_pressed()
+    {
+        GD.Print("Pressed next turn button!");
+        NextTurn();
+    }
+
+    public void NextTurn()
+    {
+        if (Current_State is PlayerTurnState) { SetState(new NpcTurnState()); }
+        else if (Current_State is NpcTurnState) { SetState(new PlayerTurnState()); }
+        CurrentSelection = null;
+    }
+
+    //End sprite move transition and return to previous state
+    public void EndSpriteMapObjectTransition()
+    {
+        if (Current_State is TransitionState)
+        {
+            SetState(Previous_State);
+            Main.map.PathfindingTiles.Clear();
+        }
+        else { throw new Exception("Not transitioning?!"); }
+    }
+
 }

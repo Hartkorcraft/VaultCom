@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Scripts/Main.cs" type="Script" id=1]
 [ext_resource path="res://Scenes/Debug_Manager.tscn" type="PackedScene" id=2]
@@ -9,6 +9,7 @@
 [ext_resource path="res://Scripts/Selector.cs" type="Script" id=7]
 [ext_resource path="res://Assets/Textures/Selector.png" type="Texture" id=8]
 [ext_resource path="res://Scenes/ContextMenu.tscn" type="PackedScene" id=9]
+[ext_resource path="res://Scripts/UI.cs" type="Script" id=10]
 
 [node name="Main" type="Node2D"]
 script = ExtResource( 1 )
@@ -48,13 +49,32 @@ script = ExtResource( 7 )
 zoom = Vector2( 0.5, 0.5 )
 
 [node name="UI" type="CanvasLayer" parent="."]
+script = ExtResource( 10 )
 
 [node name="ContextMenu" parent="UI" instance=ExtResource( 9 )]
 margin_right = 20.0
 margin_bottom = 20.0
-popup_exclusive = true
 hide_on_item_selection = false
 hide_on_checkable_item_selection = false
+
+[node name="Next_Turn_Button" type="Button" parent="UI"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -70.0
+margin_top = -20.0
+text = "next turn"
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="Opened_UI" type="Control" parent="UI"]
+margin_right = 40.0
+margin_bottom = 40.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
 
 [node name="DebugUI" type="CanvasLayer" parent="."]
 
@@ -62,3 +82,5 @@ hide_on_checkable_item_selection = false
 
 [node name="Game_Manager" type="Node2D" parent="."]
 script = ExtResource( 6 )
+
+[connection signal="pressed" from="UI/Next_Turn_Button" to="Game_Manager" method="_on_Next_Turn_Button_pressed"]

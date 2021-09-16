@@ -45,7 +45,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
                     var distance = 0;
                     foreach (var pathTile in path)
                     {
-                        if (distance <= MovementPoints)
+                        if (distance < MovementPoints)
                         {
                             Main.map.PathfindingTiles.SetCellv(pathTile.GridPos.Vec2(), (int)Map.TileType.Green_Dot);
                             path_positions_cache.Add(pathTile.GridPos);
@@ -70,6 +70,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         {
             if (path_positions_cache.Count > 0 && path_positions_cache[path_positions_cache.Count - 1].Equals(Main.Mouse_Grid_Pos))
             {
+                MovementPoints -= path_positions_cache.Count;
                 MoveOnPath(path_positions_cache);
                 path_positions_cache.Clear();
             }
@@ -88,8 +89,12 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
 
     public override void On_Left_Mouse_Click()
     {
+
         base.On_Left_Mouse_Click();
-        Main.game_Manager.Select(this, true);
+        if (Main.game_Manager.AllowWorldInput && Main.game_Manager.ContextMenuSafeCheck)
+        {
+            Main.game_Manager.Select(this, true);
+        }
     }
     #endregion
 
@@ -115,10 +120,25 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
     // {
 
     // }
-    public void Act_On_Context_Selection()
+    public void Act_On_Context_Selection(ContextMenu popupMenu)
     {
         GD.Print("Acted on context selection!");
+
+        // var popupBoxScene = (PackedScene)ResourceLoader.Load("res://Scenes/PopupInfoWindow.tscn");
+        // PopupInfoWindow popupBox = (PopupInfoWindow)popupBoxScene.Instance();
+        // Main.ui.Opened_UI.AddChild(popupBox);
+
+        // popupBox.PopupCentered();
+        popupMenu.Close();
     }
 
+    #endregion
+
+    #region  ITurnable
+
+    public override void AddITurnableToGameManager()
+    {
+        Main.game_Manager.PlayerTurnObjects.Add(this);
+    }
     #endregion
 }

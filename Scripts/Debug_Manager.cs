@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using HartLib;
 using static HartLib.Utils;
 
-public class Debug_Manager : Node2D
+public class Debug_Manager : Control
 {
 
     Label debugInfoLabel;
-
+    DebugConsole debugConsole;
     /// Use AddLog, DeleteLog, UpdateLog and ClearLogs()
     Dictionary<string, DebugInfo> logs = new Dictionary<string, DebugInfo>();
     string debugText = "";
@@ -17,9 +17,16 @@ public class Debug_Manager : Node2D
     public override void _EnterTree()
     {
         debugInfoLabel = (Label)GetChild(0);
+        debugConsole = (DebugConsole)GetChild(1);
         debugInfoLabel.Text = debugText;
     }
 
+    public override void _Input(InputEvent inputEvent)
+    {
+        if (inputEvent.IsActionPressed("Toggle_Debug_Menu"))
+        { debugConsole.Visible = !debugConsole.Visible; }
+    }
+    
     public void AddLog(DebugInfo log)
     {
         logs.Add(log.Name, log);

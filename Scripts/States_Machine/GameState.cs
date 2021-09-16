@@ -42,16 +42,16 @@ public abstract class GameState
 
 
     #region SELECTING
-    public virtual void Select(ISelectable selection, bool unSelectIfSame = false)
-    {
-        if (CanSelect is false) { return; }
+    // public virtual void Select(ISelectable selection, bool unSelectIfSame = false)
+    // {
+    //     if (CanSelect is false) { return; }
 
-        if (selection == game_manager.CurrentSelection && unSelectIfSame) { selection = null; }
+    //     if (selection == game_manager.CurrentSelection && unSelectIfSame) { selection = null; }
 
-        game_manager.CurrentSelection?.HandleBeingUnselected();
-        game_manager.CurrentSelection = selection;
-        game_manager.CurrentSelection?.HandleBeingSelected();
-    }
+    //     game_manager.CurrentSelection?.HandleBeingUnselected();
+    //     game_manager.CurrentSelection = selection;
+    //     game_manager.CurrentSelection?.HandleBeingSelected();
+    // }
 
     #endregion
 
