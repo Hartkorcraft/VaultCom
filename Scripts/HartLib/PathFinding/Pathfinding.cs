@@ -3,6 +3,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+//using static HartLib.PathFindingCell<TBlock><TBlock>;
 
 namespace HartLib
 {
@@ -10,11 +11,11 @@ namespace HartLib
     public class PathFinding<TBlock>
     {
         Vector2i gridSize;
-        PathFindingCell[,] grid;
+        PathFindingCell<TBlock>[,] grid;
         Func<Vector2i, HashSet<TBlock>, bool> checkBlockingTiles;
         Func<Vector2i, int, bool> checkForColliders;
 
-        public List<PathFindingCell> FindPath(Vector2i startPos, Vector2i endPos, HashSet<TBlock> blockingTiles, int collider_layer = 0, bool include_checking_last = true, bool diagonals = false, bool big = false)
+        public List<PathFindingCell<TBlock>> FindPath(Vector2i startPos, Vector2i endPos, HashSet<TBlock> blockingTiles, int collider_layer = 0, bool include_checking_last = true, bool diagonals = false, bool big = false)
         {
             int safeCheck = 700;
 
@@ -38,11 +39,11 @@ namespace HartLib
             }
 
 
-            PathFindingCell startCell = grid[startPos.x, startPos.y];
-            PathFindingCell endCell = grid[endPos.x, endPos.y];
+            PathFindingCell<TBlock> startCell = grid[startPos.x, startPos.y];
+            PathFindingCell<TBlock> endCell = grid[endPos.x, endPos.y];
 
-            List<PathFindingCell> openSet = new List<PathFindingCell>();
-            HashSet<PathFindingCell> closedSet = new HashSet<PathFindingCell>();
+            List<PathFindingCell<TBlock>> openSet = new List<PathFindingCell<TBlock>>();
+            HashSet<PathFindingCell<TBlock>> closedSet = new HashSet<PathFindingCell<TBlock>>();
             openSet.Add(startCell);
 
             while (openSet.Count > 0 && safeCheck > 0)
@@ -51,7 +52,7 @@ namespace HartLib
 
                 if (safeCheck <= 0) GD.Print("SafetyCheck");
 
-                PathFindingCell currentCell = openSet[0];
+                PathFindingCell<TBlock> currentCell = openSet[0];
 
                 for (int i = 0; i < openSet.Count; i++)
                 {
@@ -69,11 +70,11 @@ namespace HartLib
                     {
                         return null;
                     }
-                    List<PathFindingCell> path = RetracePath(startCell, endCell);
+                    List<PathFindingCell<TBlock>> path = RetracePath(startCell, endCell);
                     return path;
                 }
 
-                List<PathFindingCell> neigbours;
+                List<PathFindingCell<TBlock>> neigbours;
 
                 if (diagonals && big is false) { neigbours = GetNeigboursDiagonal(currentCell); }
                 else { neigbours = GetNeigbours(currentCell); }
@@ -154,9 +155,9 @@ namespace HartLib
             return null;
         }
 
-        List<PathFindingCell> GetNeigbours(PathFindingCell cell)
+        List<PathFindingCell<TBlock>> GetNeigbours(PathFindingCell<TBlock> cell)
         {
-            List<PathFindingCell> neigbours = new List<PathFindingCell>();
+            List<PathFindingCell<TBlock>> neigbours = new List<PathFindingCell<TBlock>>();
 
             var dirs = Enum.GetValues(typeof(Dir));
             foreach (Dir direction in dirs)
@@ -170,9 +171,9 @@ namespace HartLib
             return neigbours;
         }
 
-        List<PathFindingCell> GetNeigboursDiagonal(PathFindingCell cell) //TODO Going up doesn't work 
+        List<PathFindingCell<TBlock>> GetNeigboursDiagonal(PathFindingCell<TBlock> cell) //TODO Going up doesn't work 
         {
-            List<PathFindingCell> neigbours = new List<PathFindingCell>();
+            List<PathFindingCell<TBlock>> neigbours = new List<PathFindingCell<TBlock>>();
 
             var dirs = Enum.GetValues(typeof(DirDiagonal));
             foreach (DirDiagonal direction in dirs)
@@ -186,10 +187,10 @@ namespace HartLib
             return neigbours;
         }
 
-        List<PathFindingCell> RetracePath(PathFindingCell startNode, PathFindingCell endNode)
+        List<PathFindingCell<TBlock>> RetracePath(PathFindingCell<TBlock> startNode, PathFindingCell<TBlock> endNode)
         {
-            List<PathFindingCell> path = new List<PathFindingCell>();
-            PathFindingCell curCell = endNode;
+            List<PathFindingCell<TBlock>> path = new List<PathFindingCell<TBlock>>();
+            PathFindingCell<TBlock> curCell = endNode;
 
             while (curCell != startNode)
             {
@@ -201,7 +202,7 @@ namespace HartLib
             return path;
         }
 
-        int GetDistance(PathFindingCell cellA, PathFindingCell cellB)
+        int GetDistance(PathFindingCell<TBlock> cellA, PathFindingCell<TBlock> cellB)
         {
             int distantX = Mathf.Abs((int)(cellA.GridPos.x - cellB.GridPos.x));
             int distantY = Mathf.Abs((int)(cellA.GridPos.y - cellB.GridPos.y));
@@ -219,55 +220,19 @@ namespace HartLib
             checkForColliders = _checkForColliders;
             // for example: Func<Vector2i, HashSet<Main.TileTypes>, bool> checkForBlocking = (pos, blocking) => { return blocking.Contains((Main.TileTypes)Main.mapTiles.GetCellv(pos.Vec2())); };
 
-            grid = new PathFindingCell[gridSize.x, gridSize.y];
+            grid = new PathFindingCell<TBlock>[gridSize.x, gridSize.y];
 
             for (int y = 0; y < gridSize.y; y++)
             {
                 for (int x = 0; x < gridSize.x; x++)
                 {
-                    grid[x, y] = new PathFindingCell(new Vector2i(x, y));
+                    grid[x, y] = new PathFindingCell<TBlock>(new Vector2i(x, y));
                 }
             }
 
         }
 
 
-        public class PathFindingCell
-        {
-            public Vector2i GridPos { get; set; }
-            public PathFindingCell Parent { get; set; }
-
-            public bool CheckForTiles(HashSet<TBlock> checkingFor, Func<Vector2i, HashSet<TBlock>, bool> checkBlockingTiles)
-            {
-                if (checkingFor is null || checkingFor.Count < 1) return false;
-
-                if (checkBlockingTiles(GridPos, checkingFor)) { return true; }
-
-                return false;
-            }
-
-            public bool CheckForColliders(int checkingFor, Func<Vector2i, int, bool> checkColliders)
-            {
-                if (checkColliders is null || checkingFor == 0) return false;
-
-                if (checkColliders(GridPos, checkingFor)) { return true; }
-
-                return false;
-            }
-
-            public int GCost { get; set; }
-            public int HCost { get; set; }
-            public int FCost
-            {
-                get { return GCost + HCost; }
-            }
-
-            public PathFindingCell(Vector2i gridPos)
-            {
-                this.GridPos = gridPos;
-            }
-
-        }
 
 
     }

@@ -10,7 +10,7 @@ public class Main : Node2D
     public static Map map { get; private set; }
     public static Debug_Manager debug_Manager { get; private set; }
     public static Game_Manager game_Manager { get; private set; }
-    public static ContextMenu context_menu { get; private set; }
+    //public static ContextMenu context_menu { get; private set; }
     public static UI ui { get; private set; }
 
     [Export] Vector2 initMapSize = new Vector2(5, 5);
@@ -62,7 +62,8 @@ public class Main : Node2D
         debug_Manager = (Debug_Manager)GetNode("DebugUI").GetNode("Debug_Manager");
         game_Manager = (Game_Manager)GetNode("Game_Manager");
         ui = (UI)GetNode("UI");
-        context_menu = (ContextMenu)ui.GetNode("ContextMenu");
+        
+        //context_menu = (ContextMenu)ui.GetNode("ContextMenu");
         
         map = new Map(
         new Vector2ui(InitMapSize)

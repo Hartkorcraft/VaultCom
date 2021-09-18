@@ -123,6 +123,14 @@ public class Map
         Wood = 2,
         Brick_Wall = 5,
         Red_Dot = 6,
-        Green_Dot = 7
+        Green_Dot = 7,
+        Wall_Top = 8,
+        Wall_Side = 9,
+        Wall_1 = 10,
+        Wall_2 = 11,
+        Wall_3 = 12,
+        Wall_4 = 13,
+        Wall_5 = 14,
+        Wall_6 = 15
     }
 }

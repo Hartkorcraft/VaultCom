@@ -8,9 +8,9 @@ public class Game_Manager : Node2D
 {
     public GameState Current_State { get; private set; }
     public GameState Previous_State { get; private set; }
-    public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
+    //public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
     public bool DebugConsoleOpen { get { return Main.debug_Manager.debugConsole.Visible; } }
-    public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
+    //public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
     public bool AllowWorldInput { get { return Current_State.AllowWorldInput; } }
     public HashSet<ITurnable> PlayerTurnObjects { get; } = new HashSet<ITurnable>();
     public HashSet<ITurnable> NpcTurnObjects { get; } = new HashSet<ITurnable>();
@@ -99,6 +99,7 @@ public class Game_Manager : Node2D
 
     public void NextTurn()
     {
+        Main.map.PathfindingTiles.Clear();
         if (Current_State is PlayerTurnState) { SetState(new NpcTurnState()); }
         else if (Current_State is NpcTurnState) { SetState(new PlayerTurnState()); }
         CurrentSelection = null;

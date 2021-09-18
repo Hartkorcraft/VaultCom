@@ -18,6 +18,14 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         //* Blocking
         blockingMovement.Add(Map.TileType.Brick_Wall);
 
+        blockingMovement.Add(Map.TileType.Wall_Top);
+        blockingMovement.Add(Map.TileType.Wall_Side);
+        blockingMovement.Add(Map.TileType.Wall_1);
+        blockingMovement.Add(Map.TileType.Wall_2);
+        blockingMovement.Add(Map.TileType.Wall_3);
+        blockingMovement.Add(Map.TileType.Wall_4);
+        blockingMovement.Add(Map.TileType.Wall_5);
+        blockingMovement.Add(Map.TileType.Wall_6);
         GridPos = new Vector2i(Position / new Vector2(Main.TILE_SIZE, Main.TILE_SIZE));
     }
 
@@ -91,7 +99,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
     {
 
         base.On_Left_Mouse_Click();
-        if (Main.game_Manager.AllowWorldInput && Main.game_Manager.ContextMenuSafeCheck)
+        if (Main.game_Manager.AllowWorldInput) // Main.game_Manager.ContextMenuSafeCheck)
         {
             Main.game_Manager.Select(this, true);
         }
