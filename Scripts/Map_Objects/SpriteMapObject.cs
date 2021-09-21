@@ -31,7 +31,7 @@ public class SpriteMapObject : MapObject, IMouseable
 
     #endregion
 
-    // #region  IMOVEABLE 
+    #region MOVEABLE 
     private List<Vector2i> transition_positions = new List<Vector2i>();
     [Export] private float Transition_Speed = 0.3f;
 
@@ -52,7 +52,7 @@ public class SpriteMapObject : MapObject, IMouseable
             {
                 transition_positions.RemoveAt(0);
                 GridPos = new_grid_pos;
-                if (transition_positions.Count <= 0) { Main.game_Manager.EndSpriteMapObjectTransition(); }
+                if (transition_positions.Count <= 0) { Main.game_Manager.EndSpriteMapObjectTransition(this); }
             }
             Position = Lerp(Position, new_pos, smooth);
         }
@@ -64,7 +64,7 @@ public class SpriteMapObject : MapObject, IMouseable
         transition_positions.AddRange(positions);
     }
 
-    // #endregion
+    #endregion
 
     #region  IMOUSEABLE 
     public virtual void _on_Area2D_input_event(Node viepoint, InputEvent inputEvent, int local_shape)

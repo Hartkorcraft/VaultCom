@@ -6,5 +6,6 @@ public interface ITurnable
 
     public void StartTurn();
     public void ResetMovementPoints();
+    public void UpdateTurnObject();
     public void AddITurnableToGameManager();
 }

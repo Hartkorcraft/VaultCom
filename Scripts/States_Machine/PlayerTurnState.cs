@@ -12,11 +12,7 @@ public class PlayerTurnState : GameState
     public PlayerTurnState()
     {
         allowWorldInput = true;
-
-        foreach (ITurnable playerTurnObject in game_manager.PlayerTurnObjects)
-        {
-            playerTurnObject.StartTurn();
-        }
+        game_manager.UpdatePlayerTurnObjects();
     }
 
 }

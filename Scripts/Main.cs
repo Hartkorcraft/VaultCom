@@ -10,8 +10,8 @@ public class Main : Node2D
     public static Map map { get; private set; }
     public static Debug_Manager debug_Manager { get; private set; }
     public static Game_Manager game_Manager { get; private set; }
-    //public static ContextMenu context_menu { get; private set; }
     public static UI ui { get; private set; }
+    //public static ContextMenu context_menu { get; private set; }
 
     [Export] Vector2 initMapSize = new Vector2(5, 5);
     public Vector2i InitMapSize
@@ -24,18 +24,7 @@ public class Main : Node2D
     public static Vector2i Mouse_Grid_Pos { get { return MouseToCart(Mouse_Pos, Main.map.FloorTiles); } }
     public static Vector2i Last_Clicked_Grid_Pos { get; private set; } = new Vector2i(-1, -1);
     public static int TILE_SIZE { get; private set; }
-    
-    // public static CollisionObject2D Get_Collider_From_Pos(Vector2 pos)
-    // {
-    //     Godot.Collections.Array result = main.GetWorld2d().DirectSpaceState.IntersectPoint(pos, 32, null, 2147483647, true, true);
 
-    //     if (result.Count > 0)
-    //     {
-    //         Godot.Collections.Dictionary dic = (Godot.Collections.Dictionary)result[0];
-    //         return (CollisionObject2D)((Godot.Collections.Dictionary)result[0])["collider"];
-    //     }
-    //     return null;
-    // }
 
     public static List<Godot.Collections.Dictionary> Get_Collider_Dicts_From_GridPos(Vector2i _pos, uint layer = 2147483647)
     {
@@ -62,9 +51,9 @@ public class Main : Node2D
         debug_Manager = (Debug_Manager)GetNode("DebugUI").GetNode("Debug_Manager");
         game_Manager = (Game_Manager)GetNode("Game_Manager");
         ui = (UI)GetNode("UI");
-        
+
         //context_menu = (ContextMenu)ui.GetNode("ContextMenu");
-        
+
         map = new Map(
         new Vector2ui(InitMapSize)
         );
@@ -92,8 +81,6 @@ public class Main : Node2D
         "Mid: " + map.GetTileType(Mouse_Grid_Pos, map.MidTiles).ToString());
     }
 
-
-
     #endregion
 
     #region INPUT 
@@ -114,7 +101,7 @@ public class Main : Node2D
             }
         }
     }
-    
+
     public void On_Left_Mouse_Click()
     {
         Last_Clicked_Grid_Pos = Mouse_Grid_Pos;

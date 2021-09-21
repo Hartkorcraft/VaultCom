@@ -11,7 +11,7 @@ public class DebugConsole : Control
     public override void _EnterTree()
     {
         base._EnterTree();
-        consoleManager = new ConsoleCommandsManager(this);
+        consoleManager = new ConsoleCommandsManager(Main.debug_Manager, this);
         outputBox = (TextEdit)GetNode("Output");
         inputBox = (LineEdit)GetNode("Input");
     }

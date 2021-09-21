@@ -11,7 +11,7 @@ namespace HartLib
     public class PathFinding<TBlock>
     {
         Vector2i gridSize;
-        PathFindingCell<TBlock>[,] grid;
+        public PathFindingCell<TBlock>[,] grid { get; private set; }
         Func<Vector2i, HashSet<TBlock>, bool> checkBlockingTiles;
         Func<Vector2i, int, bool> checkForColliders;
 
@@ -155,6 +155,69 @@ namespace HartLib
             return null;
         }
 
+        public List<PathFindingCell<TBlock>> FindPossibleSpaces(Vector2i startPos, int range, HashSet<TBlock> blockingTiles, int collider_layer = 0)
+        {
+            var possibleSpaces = new List<PathFindingCell<TBlock>>();
+            int safeCheck = 700;
+
+
+            PathFindingCell<TBlock> startCell = grid[startPos.x, startPos.y];
+            startCell.Step = 0;
+
+            List<PathFindingCell<TBlock>> openSet = new List<PathFindingCell<TBlock>>();
+            HashSet<PathFindingCell<TBlock>> closedSet = new HashSet<PathFindingCell<TBlock>>();
+            openSet.Add(startCell);
+
+            while (openSet.Count > 0 && safeCheck > 0)
+            {
+                safeCheck--;
+
+                if (safeCheck <= 0) GD.Print("SafetyCheck");
+
+                PathFindingCell<TBlock> currentCell = openSet[0];
+
+                openSet.Remove(currentCell);
+                closedSet.Add(currentCell);
+                //possibleSpaces.Add(currentCell);
+                List<PathFindingCell<TBlock>> neigbours = GetNeigboursDiagonal(currentCell);
+
+                for (int i = 0; i < neigbours.Count; i++)
+                {
+
+                    if (closedSet.Contains(neigbours[i])
+                    || ((neigbours[i].CheckForTiles(blockingTiles, checkBlockingTiles)
+                    || (neigbours[i].CheckForColliders(collider_layer, checkForColliders))))
+                    || (Math.Abs(startPos.x - neigbours[i].GridPos.x) > range)
+                    || (Math.Abs(startPos.y - neigbours[i].GridPos.y) > range))
+                    {
+                        continue;
+                    }
+
+
+                    var neigbhourPos = neigbours[i].GridPos;
+                    int newCostToNeighbour = currentCell.GCost + GetDistance(currentCell, neigbours[i]);
+
+                    if (newCostToNeighbour < neigbours[i].GCost || openSet.Contains(neigbours[i]) is false)
+                    {
+                        neigbours[i].GCost = newCostToNeighbour;
+                        neigbours[i].Parent = currentCell;
+                        neigbours[i].Step = currentCell.Step + 1;
+
+                        if (neigbours[i].Step <= range && possibleSpaces.Contains(neigbours[i]) is false) { possibleSpaces.Add(neigbours[i]); }
+                        if (openSet.Contains(neigbours[i]) == false)
+                        {
+                            openSet.Add(neigbours[i]);
+                        }
+                    }
+                }
+
+            }
+
+
+
+            return possibleSpaces;
+        }
+
         List<PathFindingCell<TBlock>> GetNeigbours(PathFindingCell<TBlock> cell)
         {
             List<PathFindingCell<TBlock>> neigbours = new List<PathFindingCell<TBlock>>();
@@ -171,7 +234,7 @@ namespace HartLib
             return neigbours;
         }
 
-        List<PathFindingCell<TBlock>> GetNeigboursDiagonal(PathFindingCell<TBlock> cell) //TODO Going up doesn't work 
+        List<PathFindingCell<TBlock>> GetNeigboursDiagonal(PathFindingCell<TBlock> cell)
         {
             List<PathFindingCell<TBlock>> neigbours = new List<PathFindingCell<TBlock>>();
 

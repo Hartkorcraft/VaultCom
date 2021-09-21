@@ -14,16 +14,6 @@ public class Map
     private GridCell[,] gridMap;
     public PathFinding<Map.TileType> PathFinding { get; private set; }
 
-    // public void DisplayPath(List<PathFinding<TileTypes>.PathFindingCell> path, bool clear = true)
-    // {
-    //     if (clear) PathFindingTiles.Clear();
-    //     if (path is null) return;
-    //     foreach (var pathPos in path)
-    //     {
-    //         PathFindingTiles.SetCellv(pathPos.GridPos.Vec2(), (int)TileTypes.Dot);
-    //     }
-    // }
-
     public void InitGridMap(Vector2ui _MapSize, bool clear = true)
     {
         if (clear)
@@ -115,22 +105,14 @@ public class Map
         Func<Vector2i, int, bool> check_for_colliders = (pos, layer) => { return Main.Get_Collider_Dicts_From_GridPos(pos, 1).Count > 0; };
         PathFinding = new PathFinding<TileType>(new Vector2i(_mapSize), checkForBlocking, check_for_colliders);
     }
+
+    
     public enum TileType
     {
         Empty = -1,
-        Grass = 0,
-        Rock = 1,
-        Wood = 2,
-        Brick_Wall = 5,
-        Red_Dot = 6,
-        Green_Dot = 7,
-        Wall_Top = 8,
-        Wall_Side = 9,
-        Wall_1 = 10,
-        Wall_2 = 11,
-        Wall_3 = 12,
-        Wall_4 = 13,
-        Wall_5 = 14,
-        Wall_6 = 15
+        Grass = 1,
+        Red_Dot = 16,
+        Green_Dot = 17,
+        Transparent_Green = 18
     }
 }

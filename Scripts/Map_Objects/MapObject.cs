@@ -22,7 +22,7 @@ public abstract class MapObject : Node2D, IHealth, INameable
 
 
     #region IHEALTH
-
+    public int HealthCap { get; set; } = 5;
     public int Health { get; set; } = 1;
     public virtual void Damage(uint dmg)
     {
@@ -38,8 +38,11 @@ public abstract class MapObject : Node2D, IHealth, INameable
     }
     public virtual void Heal(uint health)
     {
-        Health += (int)health;
-        GD.Print("Healed: ", this.ToString(), " ", health, " New health: ", Health);
+        if (Health + health <= HealthCap)
+        {
+            Health += (int)health; 
+            GD.Print("Healed: ", this.ToString(), " ", health, " New health: ", Health);
+        }
     }
     public virtual void Kill()
     {

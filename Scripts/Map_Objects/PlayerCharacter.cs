@@ -14,18 +14,6 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
     public override void _EnterTree()
     {
         base._EnterTree();
-
-        //* Blocking
-        blockingMovement.Add(Map.TileType.Brick_Wall);
-
-        blockingMovement.Add(Map.TileType.Wall_Top);
-        blockingMovement.Add(Map.TileType.Wall_Side);
-        blockingMovement.Add(Map.TileType.Wall_1);
-        blockingMovement.Add(Map.TileType.Wall_2);
-        blockingMovement.Add(Map.TileType.Wall_3);
-        blockingMovement.Add(Map.TileType.Wall_4);
-        blockingMovement.Add(Map.TileType.Wall_5);
-        blockingMovement.Add(Map.TileType.Wall_6);
         GridPos = new Vector2i(Position / new Vector2(Main.TILE_SIZE, Main.TILE_SIZE));
     }
 
@@ -33,6 +21,8 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
     {
         base._Ready();
         GD.Print("Spawned at: " + Position);
+
+        CalculatePossiblePositions();
     }
 
     public override void _Process(float delta)
@@ -41,8 +31,9 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
 
         if (Main.game_Manager.AllowWorldInput)//&& inputEvent.IsActionPressed("Left_Mouse"))
         {
-            if (Main.game_Manager.CurrentSelection == this && Main.game_Manager.Mouseover.Count == 0 && (!lastMouseGridPos.Equals(Main.Mouse_Grid_Pos) || path_positions_cache.Count == 0))
+            if (Main.game_Manager.CurrentSelection == this && Main.game_Manager.Mouseover.Count == 0 && MovementPoints > 0 && (!lastMouseGridPos.Equals(Main.Mouse_Grid_Pos) || path_positions_cache.Count == 0))
             {
+
                 Main.map.PathfindingTiles.Clear();
                 var path = Main.map.PathFinding.FindPath(GridPos, Main.Mouse_Grid_Pos, blockingMovement, collider_layer: 1, diagonals: true, big: false);
 
@@ -51,6 +42,8 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
                 {
                     path_positions_cache.Clear();
                     var distance = 0;
+
+                    //drawing path
                     foreach (var pathTile in path)
                     {
                         if (distance < MovementPoints)
@@ -102,6 +95,9 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         if (Main.game_Manager.AllowWorldInput) // Main.game_Manager.ContextMenuSafeCheck)
         {
             Main.game_Manager.Select(this, true);
+
+            //! TEMPORARY DELET 
+            foreach (var possible_tile in posible_positions_tile_cache) { Main.map.PathfindingTiles.SetCellv(possible_tile.GridPos.Vec2(), (int)Map.TileType.Transparent_Green); }
         }
     }
     #endregion

@@ -8,12 +8,12 @@ public class Game_Manager : Node2D
 {
     public GameState Current_State { get; private set; }
     public GameState Previous_State { get; private set; }
-    //public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
     public bool DebugConsoleOpen { get { return Main.debug_Manager.debugConsole.Visible; } }
-    //public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
     public bool AllowWorldInput { get { return Current_State.AllowWorldInput; } }
     public HashSet<ITurnable> PlayerTurnObjects { get; } = new HashSet<ITurnable>();
     public HashSet<ITurnable> NpcTurnObjects { get; } = new HashSet<ITurnable>();
+    //public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
+    //public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
 
     public void SetState(GameState new_game_state)
     {
@@ -22,7 +22,6 @@ public class Game_Manager : Node2D
         Current_State = new_game_state;
         Current_State.ReadyState();
         Main.debug_Manager.UpdateLog("GameStates", "Current: " + Current_State.GetType().ToString() + " Previous: " + Previous_State.GetType().ToString());
-
     }
 
     #region SELECTION
@@ -60,6 +59,21 @@ public class Game_Manager : Node2D
 
     public void AddMouseOverObject(IMouseable imouseable) { Mouseover.Add(imouseable); }
     public bool RemoveMouseOverObject(IMouseable imouseable) { return Mouseover.Remove(imouseable); }
+    public void UpdatePlayerTurnObjects()
+    {
+        foreach (ITurnable playerObject in PlayerTurnObjects)
+        {
+            playerObject.UpdateTurnObject();
+            playerObject.StartTurn();
+        }
+    }
+    public void UpdateNpcTurnObjects()
+    {
+        foreach (ITurnable npcObject in NpcTurnObjects)
+        {
+            npcObject.UpdateTurnObject();
+        }
+    }
     public string GetMouseOverHashSetString()
     {
         string imouseableObjects = "";
@@ -82,7 +96,6 @@ public class Game_Manager : Node2D
     {
         Main.debug_Manager.AddLog(new DebugInfo("Current_Selection"));
         Main.debug_Manager.AddLog(new DebugInfo("GameStates"));
-        //Main.debug_Manager.AddLog(new DebugInfo("GameStates"));
         SetState(new StartState());
     }
     public override void _Process(float delta)
@@ -106,8 +119,13 @@ public class Game_Manager : Node2D
     }
 
     //End sprite move transition and return to previous state
-    public void EndSpriteMapObjectTransition()
+    public void EndSpriteMapObjectTransition(SpriteMapObject mapObject)
     {
+        if (mapObject is ITurnable)
+        {
+            ((ITurnable)mapObject).UpdateTurnObject(); GD.Print("updated xDdddddd");
+        }
+
         if (Current_State is TransitionState)
         {
             SetState(Previous_State);

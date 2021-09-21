@@ -1,0 +1,53 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://Assets/NewTileSet.tres" type="TileSet" id=1]
+[ext_resource path="res://Assets/Textures/TestCharacter.png" type="Texture" id=2]
+
+[sub_resource type="Shader" id=1]
+code = "shader_type canvas_item;
+
+vec4 sample_glow_pixel(sampler2D tex, vec2 uv) {
+    float hdr_threshold = 1.0; // Pixels with higher color than 1 will glow
+    return max(texture(tex, uv) - hdr_threshold, vec4(0.0));
+}
+
+void fragment() {
+    vec2 ps = SCREEN_PIXEL_SIZE;
+    // Get blurred color from pixels considered glowing
+    vec4 col0 = sample_glow_pixel(SCREEN_TEXTURE, SCREEN_UV + vec2(-ps.x, 0));
+    vec4 col1 = sample_glow_pixel(SCREEN_TEXTURE, SCREEN_UV + vec2(ps.x, 0));
+    vec4 col2 = sample_glow_pixel(SCREEN_TEXTURE, SCREEN_UV + vec2(0, -ps.y));
+    vec4 col3 = sample_glow_pixel(SCREEN_TEXTURE, SCREEN_UV + vec2(0, ps.y));
+
+    vec4 col = texture(SCREEN_TEXTURE, SCREEN_UV);
+    vec4 glowing_col = 0.25 * (col0 + col1 + col2 + col3);
+
+    COLOR = vec4(col.rgb + glowing_col.rgb, col.a);
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+
+[node name="TileMap" type="ColorRect"]
+self_modulate = Color( 1, 1, 1, 0 )
+material = SubResource( 2 )
+margin_right = 192.0
+margin_bottom = 160.0
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="ColorRect" type="TileMap" parent="."]
+use_parent_material = true
+tile_set = ExtResource( 1 )
+cell_size = Vector2( 16, 16 )
+compatibility_mode = true
+centered_textures = true
+cell_clip_uv = true
+format = 1
+tile_data = PoolIntArray( 131077, 536870914, 0, 196609, 536870928, 0, 196610, 536870928, 0, 196612, 536870914, 0, 196613, 536870914, 0, 262145, 536870928, 0, 262146, 536870928, 0, 262148, 536870914, 0, 262149, 536870914, 0, 327681, 536870928, 0, 327682, 536870928, 0, 327683, 536870929, 0, 327684, 536870928, 0, 327685, 536870928, 0, 393217, 536870915, 0, 393218, 536870915, 0, 393219, 536870929, 0, 393220, 536870929, 0, 393221, 536870918, 0, 393222, 536870918, 0, 393224, 536870928, 0, 458753, 536870915, 0, 458754, 536870915, 0, 458755, 536870929, 0, 458756, 536870929, 0, 458757, 536870918, 0, 458758, 536870918, 0, 458759, 536870928, 0, 458760, 536870928, 0, 524291, 536870928, 0, 524292, 536870928, 0, 524293, 536870928, 0, 524294, 536870928, 0, 524295, 536870928, 0, 524296, 536870928, 0, 589825, 536870928, 0, 589827, 536870928, 0, 589828, 536870928, 0, 589829, 536870928, 0, 589830, 536870928, 0, 589831, 536870928, 0, 589832, 536870928, 0, 655361, 536870928, 0, 655363, 536870928, 0, 655364, 536870928, 0, 655365, 536870928, 0, 655366, 536870928, 0, 655367, 536870928, 0, 655368, 536870928, 0, 720897, 536870928, 0, 720898, 536870928, 0, 720899, 536870928, 0, 720900, 536870928, 0, 720901, 536870928, 0, 720902, 536870928, 0, 786434, 536870928, 0 )
+
+[node name="Sprite" type="Sprite" parent="."]
+use_parent_material = true
+position = Vector2( 32, 32 )
+texture = ExtResource( 2 )
