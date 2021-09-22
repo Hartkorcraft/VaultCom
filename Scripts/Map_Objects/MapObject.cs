@@ -19,11 +19,10 @@ public abstract class MapObject : Node2D, IHealth, INameable
     }
     public string ObjectName { get; protected set; } = "Default_name";
 
-
-
     #region IHEALTH
     public int HealthCap { get; set; } = 5;
     public int Health { get; set; } = 1;
+
     public virtual void Damage(uint dmg)
     {
         if (Health - (int)dmg <= 0)
@@ -36,6 +35,7 @@ public abstract class MapObject : Node2D, IHealth, INameable
         }
         GD.Print("Damaged: ", this.ToString(), " ", dmg, " New health: ", Health);
     }
+
     public virtual void Heal(uint health)
     {
         if (Health + health <= HealthCap)
@@ -44,12 +44,12 @@ public abstract class MapObject : Node2D, IHealth, INameable
             GD.Print("Healed: ", this.ToString(), " ", health, " New health: ", Health);
         }
     }
+
     public virtual void Kill()
     {
         GD.Print("Destroyed: ", this.ToString());
         QueueFree();
     }
-
     #endregion
 
     #region ENTER TREE READY ETC

@@ -15,7 +15,7 @@ public class TwoPointLine : Line2D
     public override void _Process(float delta)
     {
         base._Process(delta);
-        
+
         SetPointPosition(0, (new Vector2(0, 0) + new Vector2(Main.TILE_SIZE / 2, Main.TILE_SIZE / 2)));
         SetPointPosition(1, get_Line_End_Point());
         //line2D.Update();
@@ -34,4 +34,11 @@ public class TwoPointLine : Line2D
     {
         get_Line_End_Point = _get_Line_End_Point;
     }
+
+    // void Setup_TwoPointLine()
+    // {
+    //     Func<Vector2> get_Line_End_Point = () => { return GetLocalMousePosition(); };
+    //     twoPointLine = new TwoPointLine(get_Line_End_Point);
+    //     AddChild(twoPointLine);
+    // }
 }

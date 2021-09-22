@@ -8,8 +8,9 @@ public abstract class Entity : SpriteMapObject, ITurnable
 {
     public int MovementPointsCap { get; set; } = 5;
     public int MovementPoints { get; set; } = 5;
-    protected List<Vector2i> path_positions_cache = new List<Vector2i>();
-    protected List<Vector2i> posible_positions_tile_cache = new List<Vector2i>();
+    public List<Vector2i> path_positions_cache { get; protected set; } = new List<Vector2i>();
+    public List<Vector2i> posible_positions_tile_cache { get; protected set; } = new List<Vector2i>();
+
     public void ResetMovementPoints() { MovementPoints = MovementPointsCap; }
 
     public override void _EnterTree()
@@ -17,6 +18,7 @@ public abstract class Entity : SpriteMapObject, ITurnable
         base._EnterTree();
         AddITurnableToGameManager();
     }
+
     public virtual void StartTurn()
     {
         ResetMovementPoints();
@@ -32,5 +34,6 @@ public abstract class Entity : SpriteMapObject, ITurnable
     {
         CalculatePossiblePositions();
     }
+
     public abstract void AddITurnableToGameManager();
 }

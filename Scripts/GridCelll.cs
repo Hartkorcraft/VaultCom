@@ -8,9 +8,8 @@ public class GridCell
 {
     private Vector2i gridPos;
     public Vector2i GridPos { get { return gridPos; } private set { gridPos = value; } }
-
-    private Map.TileType floorTile;
-    public Map.TileType FloorTile
+    private TileType floorTile;
+    public TileType FloorTile
     {
         get { return floorTile; }
         set
@@ -19,8 +18,8 @@ public class GridCell
             Main.map?.FloorTiles.SetCellv(GridPos.Vec2(), (int)floorTile);
         }
     }
-    private Map.TileType midTile;
-    public Map.TileType MidTile
+    private TileType midTile;
+    public TileType MidTile
     {
         get { return midTile; }
         set
@@ -29,7 +28,7 @@ public class GridCell
             Main.map?.MidTiles.SetCellv(GridPos.Vec2(), (int)midTile);
         }
     }
-    public GridCell(Vector2i _gridPos, Map.TileType _floorTile = Map.TileType.Grass, Map.TileType _midTile = Map.TileType.Empty)
+    public GridCell(Vector2i _gridPos, TileType _floorTile = TileType.Grass, TileType _midTile = TileType.Empty)
     {
         GridPos = _gridPos;
         FloorTile = _floorTile;

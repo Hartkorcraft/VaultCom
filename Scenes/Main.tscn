@@ -108,12 +108,12 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="Container" type="Control" parent="UI"]
+[node name="ButtonsContainer" type="Control" parent="UI"]
 margin_top = 496.0
-margin_right = 40.0
-margin_bottom = 536.0
+margin_right = 192.0
+margin_bottom = 592.0
 
-[node name="PrimaryButton" type="TextureButton" parent="UI/Container"]
+[node name="PrimaryButton" type="TextureButton" parent="UI/ButtonsContainer"]
 margin_right = 100.0
 margin_bottom = 100.0
 texture_normal = ExtResource( 9 )
@@ -123,7 +123,7 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
-[node name="UseButtor" type="TextureButton" parent="UI/Container"]
+[node name="UseButton" type="TextureButton" parent="UI/ButtonsContainer"]
 margin_left = 96.0
 margin_right = 196.0
 margin_bottom = 100.0
@@ -142,3 +142,5 @@ __meta__ = {
 script = ExtResource( 6 )
 
 [connection signal="pressed" from="UI/Next_Turn_Button" to="Game_Manager" method="_on_Next_Turn_Button_pressed"]
+[connection signal="button_down" from="UI/ButtonsContainer/PrimaryButton" to="UI" method="_on_PrimaryButton_button_down"]
+[connection signal="button_down" from="UI/ButtonsContainer/UseButton" to="UI" method="_on_UseButton_button_down"]

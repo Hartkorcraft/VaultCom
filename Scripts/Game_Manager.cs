@@ -12,20 +12,23 @@ public class Game_Manager : Node2D
     public bool AllowWorldInput { get { return Current_State.AllowWorldInput; } }
     public HashSet<ITurnable> PlayerTurnObjects { get; } = new HashSet<ITurnable>();
     public HashSet<ITurnable> NpcTurnObjects { get; } = new HashSet<ITurnable>();
+
+    public static event Action<GameState> changed_state_event;
     //public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
     //public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
+
 
     public void SetState(GameState new_game_state)
     {
         if (Current_State != null) { Current_State.ExitState(); }
         Previous_State = Current_State;
         Current_State = new_game_state;
+        changed_state_event?.Invoke(new_game_state);
         Current_State.ReadyState();
         Main.debug_Manager.UpdateLog("GameStates", "Current: " + Current_State.GetType().ToString() + " Previous: " + Previous_State.GetType().ToString());
     }
 
     #region SELECTION
-
     private ISelectable currentSelection;
     public ISelectable CurrentSelection
     {
@@ -54,9 +57,7 @@ public class Game_Manager : Node2D
     #endregion
 
     #region MOUSE OVER
-
     public HashSet<IMouseable> Mouseover { get; private set; } = new HashSet<IMouseable>();
-
     public void AddMouseOverObject(IMouseable imouseable) { Mouseover.Add(imouseable); }
     public void RemoveMouseOverObject(IMouseable imouseable) { Mouseover.Remove(imouseable); }
 
@@ -65,11 +66,13 @@ public class Game_Manager : Node2D
         foreach (ITurnable playerObject in PlayerTurnObjects) { playerObject.StartTurn(); }
         UpdateTurnObjects();
     }
+
     public void StartNpcTurn()
     {
         foreach (ITurnable npcObject in NpcTurnObjects) { npcObject.StartTurn(); }
         UpdateTurnObjects();
     }
+
     public void UpdateTurnObjects()
     {
         foreach (ITurnable npcObject in NpcTurnObjects)
@@ -95,7 +98,6 @@ public class Game_Manager : Node2D
     #endregion
 
     #region ENTER TREE, READY, PROCESS, INPUT etc.
-
     public override void _EnterTree()
     {
         SpriteMapObject.end_transition_event += EndSpriteMapObjectTransition;
@@ -103,7 +105,6 @@ public class Game_Manager : Node2D
         SpriteMapObject.mouse_enter_over_event += AddMouseOverObject;
         SpriteMapObject.mouse_exit_over_event += RemoveMouseOverObject;
     }
-
     public override void _ExitTree()
     {
         base._ExitTree();
@@ -122,9 +123,6 @@ public class Game_Manager : Node2D
     {
         Current_State.UpdateState();
     }
-
-
-
     #endregion
 
     public void _on_Next_Turn_Button_pressed()
@@ -144,7 +142,6 @@ public class Game_Manager : Node2D
     //End sprite move transition and return to previous state
     public void EndSpriteMapObjectTransition(SpriteMapObject mapObject)
     {
-
         UpdateTurnObjects();
         if (Current_State is TransitionState)
         {

@@ -1,7 +1,6 @@
 
 public class StartState : GameState
 {
-
     public override void ReadyState()
     {
         base.ReadyState();

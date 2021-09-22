@@ -12,7 +12,7 @@ public class Map
     public TileMap HighlightTiles { get; private set; }
     public Vector2ui MapSize { get; private set; } = new Vector2ui(10, 10);
     private GridCell[,] gridMap;
-    public PathFinding<Map.TileType> PathFinding { get; private set; }
+    public PathFinding<TileType> PathFinding { get; private set; }
 
     public void InitGridMap(Vector2ui _MapSize, bool clear = true)
     {
@@ -41,7 +41,7 @@ public class Map
         Main.map.HighlightTiles.Clear();
         if (positions != null)
         {
-            foreach (var possible_tile in positions) { Main.map.HighlightTiles.SetCellv(possible_tile.Vec2(), (int)Map.TileType.Transparent_Green); }
+            foreach (var possible_tile in positions) { Main.map.HighlightTiles.SetCellv(possible_tile.Vec2(), (int)TileType.Transparent_Green); }
         }
     }
 
@@ -113,15 +113,5 @@ public class Map
         };
         Func<Vector2i, int, bool> check_for_colliders = (pos, layer) => { return Main.Get_Collider_Dicts_From_GridPos(pos, 1).Count > 0; };
         PathFinding = new PathFinding<TileType>(new Vector2i(_mapSize), checkForBlocking, check_for_colliders);
-    }
-
-
-    public enum TileType
-    {
-        Empty = -1,
-        Grass = 1,
-        Red_Dot = 16,
-        Green_Dot = 17,
-        Transparent_Green = 18
     }
 }

@@ -7,8 +7,7 @@ using static HartLib.Utils;
 
 public class Selector : Sprite
 {
-    [Export]
-    public float MoveSpeed { get; set; } = 0.3f;
+    [Export] public float MoveSpeed { get; set; } = 0.3f;
 
     public override void _PhysicsProcess(float delta)
     {
