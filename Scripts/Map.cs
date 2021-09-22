@@ -9,7 +9,7 @@ public class Map
     public TileMap FloorTiles { get; private set; }
     public TileMap MidTiles { get; private set; }
     public TileMap PathfindingTiles { get; private set; }
-    //public TileMap DebugTiles { get; private set; }
+    public TileMap HighlightTiles { get; private set; }
     public Vector2ui MapSize { get; private set; } = new Vector2ui(10, 10);
     private GridCell[,] gridMap;
     public PathFinding<Map.TileType> PathFinding { get; private set; }
@@ -33,6 +33,15 @@ public class Map
                 if (floorTileType is TileType.Empty) { floorTileType = TileType.Grass; }
                 gridMap[x, y] = new GridCell(new Vector2i(x, y), floorTileType, midTileType);
             }
+        }
+    }
+
+    public void UpdateHightligthDisplay(List<Vector2i> positions)
+    {
+        Main.map.HighlightTiles.Clear();
+        if (positions != null)
+        {
+            foreach (var possible_tile in positions) { Main.map.HighlightTiles.SetCellv(possible_tile.Vec2(), (int)Map.TileType.Transparent_Green); }
         }
     }
 
@@ -94,7 +103,7 @@ public class Map
         FloorTiles = (TileMap)Tiles.GetNode("Floor_Tiles");
         MidTiles = (TileMap)Tiles.GetNode("Mid_Tiles");
         PathfindingTiles = (TileMap)Tiles.GetNode("Pathfinding_Tiles");
-
+        HighlightTiles = (TileMap)Tiles.GetNode("Highlight_Tiles");
         MapSize = _mapSize;
 
         Func<Vector2i, HashSet<TileType>, bool> checkForBlocking = (pos, blocking) =>
@@ -106,7 +115,7 @@ public class Map
         PathFinding = new PathFinding<TileType>(new Vector2i(_mapSize), checkForBlocking, check_for_colliders);
     }
 
-    
+
     public enum TileType
     {
         Empty = -1,

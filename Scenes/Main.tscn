@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=2]
+[gd_scene load_steps=18 format=2]
 
 [ext_resource path="res://Scripts/Main.cs" type="Script" id=1]
 [ext_resource path="res://Scenes/Debug_Manager.tscn" type="PackedScene" id=2]
@@ -8,7 +8,14 @@
 [ext_resource path="res://Scripts/Game_Manager.cs" type="Script" id=6]
 [ext_resource path="res://Scripts/Selector.cs" type="Script" id=7]
 [ext_resource path="res://Assets/Textures/Selector.png" type="Texture" id=8]
+[ext_resource path="res://Assets/Textures/UI/tempPrimaryButton.png" type="Texture" id=9]
 [ext_resource path="res://Scripts/UI.cs" type="Script" id=10]
+[ext_resource path="res://Assets/Textures/UI/tempUseButton.png" type="Texture" id=11]
+[ext_resource path="res://Assets/Textures/UI/tempUseButtonPressed.png" type="Texture" id=12]
+[ext_resource path="res://Assets/Textures/UI/tempPrimaryButtonPressed.png" type="Texture" id=13]
+[ext_resource path="res://Assets/Textures/UI/tempUseButtonHover.png" type="Texture" id=14]
+[ext_resource path="res://Assets/Textures/UI/tempPrimaryButtonHover.png" type="Texture" id=15]
+[ext_resource path="res://Scenes/PickUp.tscn" type="PackedScene" id=16]
 
 [sub_resource type="Environment" id=1]
 background_mode = 4
@@ -49,18 +56,35 @@ cell_size = Vector2( 16, 16 )
 format = 1
 tile_data = PoolIntArray( 131076, 0, 0, 524301, 0, 0, 589838, 0, 0, 655375, 0, 0, 720912, 0, 0, 786449, 0, 0, 983062, 0, 0, 1048599, 0, 0, 1179673, 0, 0, 1179674, 0, 0 )
 
-[node name="Character" parent="Tiles" instance=ExtResource( 5 )]
+[node name="Highlight_Tiles" type="TileMap" parent="Tiles"]
+modulate = Color( 3, 2, 3, 1 )
+tile_set = ExtResource( 3 )
+cell_size = Vector2( 16, 16 )
+format = 1
+tile_data = PoolIntArray( 131076, 0, 0, 524301, 0, 0, 589838, 0, 0, 983062, 0, 0, 1048599, 0, 0, 1179673, 0, 0, 1179674, 0, 0 )
+
+[node name="GroundItems" type="Node2D" parent="Tiles"]
+
+[node name="PickUp" parent="Tiles/GroundItems" instance=ExtResource( 16 )]
+position = Vector2( 416, 160 )
+
+[node name="Characters" type="Node2D" parent="Tiles"]
+
+[node name="Character" parent="Tiles/Characters" instance=ExtResource( 5 )]
 position = Vector2( 352, 208 )
 
-[node name="Selector" type="Sprite" parent="Tiles"]
+[node name="Character2" parent="Tiles/Characters" instance=ExtResource( 5 )]
+position = Vector2( 400, 304 )
+
+[node name="Camera2D" parent="." instance=ExtResource( 4 )]
+position = Vector2( 322, 195 )
+zoom = Vector2( 0.6, 0.6 )
+
+[node name="Selector" type="Sprite" parent="."]
 texture = ExtResource( 8 )
 centered = false
 script = ExtResource( 7 )
 MoveSpeed = 0.25
-
-[node name="Camera2D" parent="Tiles" instance=ExtResource( 4 )]
-position = Vector2( 322, 195 )
-zoom = Vector2( 0.6, 0.6 )
 
 [node name="UI" type="CanvasLayer" parent="."]
 script = ExtResource( 10 )
@@ -70,8 +94,8 @@ anchor_left = 1.0
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_left = -70.0
-margin_top = -20.0
+margin_left = -230.0
+margin_top = -100.0
 text = "next turn"
 __meta__ = {
 "_edit_use_anchors_": false
@@ -84,6 +108,32 @@ __meta__ = {
 "_edit_use_anchors_": false
 }
 
+[node name="Container" type="Control" parent="UI"]
+margin_top = 496.0
+margin_right = 40.0
+margin_bottom = 536.0
+
+[node name="PrimaryButton" type="TextureButton" parent="UI/Container"]
+margin_right = 100.0
+margin_bottom = 100.0
+texture_normal = ExtResource( 9 )
+texture_pressed = ExtResource( 13 )
+texture_hover = ExtResource( 15 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
+[node name="UseButtor" type="TextureButton" parent="UI/Container"]
+margin_left = 96.0
+margin_right = 196.0
+margin_bottom = 100.0
+texture_normal = ExtResource( 11 )
+texture_pressed = ExtResource( 12 )
+texture_hover = ExtResource( 14 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+
 [node name="DebugUI" type="CanvasLayer" parent="."]
 
 [node name="Debug_Manager" parent="DebugUI" instance=ExtResource( 2 )]
@@ -92,5 +142,3 @@ __meta__ = {
 script = ExtResource( 6 )
 
 [connection signal="pressed" from="UI/Next_Turn_Button" to="Game_Manager" method="_on_Next_Turn_Button_pressed"]
-
-[editable path="Tiles/Character"]

@@ -58,22 +58,30 @@ public class Game_Manager : Node2D
     public HashSet<IMouseable> Mouseover { get; private set; } = new HashSet<IMouseable>();
 
     public void AddMouseOverObject(IMouseable imouseable) { Mouseover.Add(imouseable); }
-    public bool RemoveMouseOverObject(IMouseable imouseable) { return Mouseover.Remove(imouseable); }
-    public void UpdatePlayerTurnObjects()
+    public void RemoveMouseOverObject(IMouseable imouseable) { Mouseover.Remove(imouseable); }
+
+    public void StartPlayerTurn()
     {
-        foreach (ITurnable playerObject in PlayerTurnObjects)
-        {
-            playerObject.UpdateTurnObject();
-            playerObject.StartTurn();
-        }
+        foreach (ITurnable playerObject in PlayerTurnObjects) { playerObject.StartTurn(); }
+        UpdateTurnObjects();
     }
-    public void UpdateNpcTurnObjects()
+    public void StartNpcTurn()
+    {
+        foreach (ITurnable npcObject in NpcTurnObjects) { npcObject.StartTurn(); }
+        UpdateTurnObjects();
+    }
+    public void UpdateTurnObjects()
     {
         foreach (ITurnable npcObject in NpcTurnObjects)
         {
             npcObject.UpdateTurnObject();
         }
+        foreach (ITurnable playerObject in PlayerTurnObjects)
+        {
+            playerObject.UpdateTurnObject();
+        }
     }
+
     public string GetMouseOverHashSetString()
     {
         string imouseableObjects = "";
@@ -90,7 +98,19 @@ public class Game_Manager : Node2D
 
     public override void _EnterTree()
     {
+        SpriteMapObject.end_transition_event += EndSpriteMapObjectTransition;
+        SpriteMapObject.moving_on_path_event += SetState;
+        SpriteMapObject.mouse_enter_over_event += AddMouseOverObject;
+        SpriteMapObject.mouse_exit_over_event += RemoveMouseOverObject;
+    }
 
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+        SpriteMapObject.end_transition_event -= EndSpriteMapObjectTransition;
+        SpriteMapObject.moving_on_path_event -= SetState;
+        SpriteMapObject.mouse_enter_over_event -= AddMouseOverObject;
+        SpriteMapObject.mouse_exit_over_event -= RemoveMouseOverObject;
     }
     public override void _Ready()
     {
@@ -102,6 +122,9 @@ public class Game_Manager : Node2D
     {
         Current_State.UpdateState();
     }
+
+
+
     #endregion
 
     public void _on_Next_Turn_Button_pressed()
@@ -121,11 +144,8 @@ public class Game_Manager : Node2D
     //End sprite move transition and return to previous state
     public void EndSpriteMapObjectTransition(SpriteMapObject mapObject)
     {
-        if (mapObject is ITurnable)
-        {
-            ((ITurnable)mapObject).UpdateTurnObject(); GD.Print("updated xDdddddd");
-        }
 
+        UpdateTurnObjects();
         if (Current_State is TransitionState)
         {
             SetState(Previous_State);

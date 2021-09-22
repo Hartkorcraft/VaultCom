@@ -8,40 +8,45 @@ using static HartLib.Utils;
 public class SpriteMapObject : MapObject, IMouseable
 {
     public Area2D area2D { get; private set; }
-    public HashSet<Map.TileType> blockingMovement { get; set; } = new HashSet<Map.TileType>();
+    public HashSet<Map.TileType> blocking_movement { get; set; } = new HashSet<Map.TileType>();
 
+    #region EVENTS 
+    public static event Action<SpriteMapObject> end_transition_event;
+    public static event Action<GameState> moving_on_path_event;
+    public static event Action<SpriteMapObject> mouse_enter_over_event;
+    public static event Action<SpriteMapObject> mouse_exit_over_event;
+    #endregion
 
     #region  ENTER_TREE READY ETC.
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     public override void _EnterTree()
     {
         base._EnterTree();
         area2D = (Area2D)GetNode("Area2D");
     }
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     public override void _Ready()
     {
         base._Ready();
     }
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     public override void _PhysicsProcess(float delta)
     {
         Transition_Position_Lerp(Transition_Speed);
     }
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #endregion
 
     #region MOVEABLE 
     private List<Vector2i> transition_positions = new List<Vector2i>();
     [Export] private float Transition_Speed = 0.3f;
-
     private bool transitioning;
     public bool Transitioning
     {
         get { return transitioning; }
         set { transitioning = value; }
     }
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     protected void Transition_Position_Lerp(float smooth = 0.3f, float clip_range = 1f)
     {
         if (transition_positions.Count > 0)
@@ -52,21 +57,27 @@ public class SpriteMapObject : MapObject, IMouseable
             {
                 transition_positions.RemoveAt(0);
                 GridPos = new_grid_pos;
-                if (transition_positions.Count <= 0) { Main.game_Manager.EndSpriteMapObjectTransition(this); }
+                if (transition_positions.Count <= 0)
+                {
+                    end_transition_event?.Invoke(this);
+                    //Main.game_Manager.EndSpriteMapObjectTransition(this);
+                }
             }
             Position = Lerp(Position, new_pos, smooth);
         }
     }
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     public void MoveOnPath(List<Vector2i> positions)
     {
-        Main.game_Manager.SetState(new TransitionState());
+        //Main.game_Manager.SetState(new TransitionState());
+        moving_on_path_event?.Invoke(new TransitionState());
         transition_positions.AddRange(positions);
     }
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     #endregion
 
     #region  IMOUSEABLE 
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     public virtual void _on_Area2D_input_event(Node viepoint, InputEvent inputEvent, int local_shape)
     {
         if (inputEvent is InputEventMouseButton)
@@ -81,33 +92,30 @@ public class SpriteMapObject : MapObject, IMouseable
                 {
                     On_Right_Mouse_Click();
                 }
-
-                //if (CanSelect) { Game_Manager.Select(this, true); }
             }
         }
     }
-
-
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     public virtual void On_Left_Mouse_Click()
     {
         GD.Print("Clicked on map object LB");
     }
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
     public virtual void On_Right_Mouse_Click()
     {
         GD.Print("Clicked on map object RB");
     }
+    //@ ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
     public virtual void _on_Area2D_mouse_entered()
     {
-        // GD.Print("Mouse entered map object");
-        Main.game_Manager.AddMouseOverObject(this);
-        Main.debug_Manager.UpdateLog("Map_Object_under_mouse", Main.game_Manager.GetMouseOverHashSetString());
+        mouse_enter_over_event?.Invoke(this);
+        Main.debug_Manager?.UpdateLog("Map_Object_under_mouse", Main.game_Manager.GetMouseOverHashSetString(), true);
     }
     public virtual void _on_Area2D_mouse_exited()
     {
-        Main.game_Manager.RemoveMouseOverObject(this);
-        Main.debug_Manager.UpdateLog("Map_Object_under_mouse", Main.game_Manager.GetMouseOverHashSetString());
-        // GD.Print("Mouse exited map object");
+        mouse_exit_over_event?.Invoke(this);
+        Main.debug_Manager?.UpdateLog("Map_Object_under_mouse", Main.game_Manager.GetMouseOverHashSetString(), true);
     }
     #endregion
 }

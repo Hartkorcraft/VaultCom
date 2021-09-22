@@ -19,6 +19,11 @@ public class Debug_Manager : Control
         debugInfoLabel.Text = debugLabelText;
     }
 
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+    }
+
     public override void _Input(InputEvent inputEvent)
     {
         if (inputEvent.IsActionPressed("Toggle_Debug_Menu"))

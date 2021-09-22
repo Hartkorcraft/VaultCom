@@ -155,7 +155,7 @@ namespace HartLib
             return null;
         }
 
-        public List<PathFindingCell<TBlock>> FindPossibleSpaces(Vector2i startPos, int range, HashSet<TBlock> blockingTiles, int collider_layer = 0)
+        public List<Vector2i> FindPossibleSpaces(Vector2i startPos, int range, HashSet<TBlock> blockingTiles, int collider_layer = 0)
         {
             var possibleSpaces = new List<PathFindingCell<TBlock>>();
             int safeCheck = 700;
@@ -215,7 +215,7 @@ namespace HartLib
 
 
 
-            return possibleSpaces;
+            return possibleSpaces.Select(x => x.GridPos).ToList();
         }
 
         List<PathFindingCell<TBlock>> GetNeigbours(PathFindingCell<TBlock> cell)
