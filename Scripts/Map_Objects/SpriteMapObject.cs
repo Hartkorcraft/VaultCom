@@ -10,12 +10,10 @@ public class SpriteMapObject : MapObject, IMouseable
     public Area2D area2D { get; private set; }
     public HashSet<TileType> blocking_movement { get; protected set; } = new HashSet<TileType>();
 
-    #region EVENTS 
     public static event Action<SpriteMapObject> end_transition_event;
     public static event Action<GameState> moving_on_path_event;
     public static event Action<SpriteMapObject> mouse_enter_over_event;
     public static event Action<SpriteMapObject> mouse_exit_over_event;
-    #endregion
 
     #region  ENTER_TREE READY ETC.
     public override void _EnterTree()
@@ -58,12 +56,18 @@ public class SpriteMapObject : MapObject, IMouseable
                 GridPos = new_grid_pos;
                 if (transition_positions.Count <= 0)
                 {
-                    end_transition_event?.Invoke(this);
+                    EndTransition();
                     //Main.game_Manager.EndSpriteMapObjectTransition(this);
                 }
             }
             Position = Lerp(Position, new_pos, smooth);
         }
+    }
+
+    protected virtual void EndTransition()
+    {
+        end_transition_event?.Invoke(this);
+
     }
 
     public void MoveOnPath(List<Vector2i> positions)
@@ -96,12 +100,12 @@ public class SpriteMapObject : MapObject, IMouseable
 
     public virtual void On_Left_Mouse_Click()
     {
-        GD.Print("Clicked on map object LB");
+        //GD.Print("Clicked on map object LB");
     }
 
     public virtual void On_Right_Mouse_Click()
     {
-        GD.Print("Clicked on map object RB");
+        //GD.Print("Clicked on map object RB");
     }
 
     public virtual void _on_Area2D_mouse_entered()

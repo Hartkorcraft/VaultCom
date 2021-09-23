@@ -36,12 +36,12 @@ public class Map
         }
     }
 
-    public void UpdateHightligthDisplay(List<Vector2i> positions)
+    public void UpdateHightligthDisplay(List<Vector2i> positions, TileType tileType = TileType.Transparent_Green)
     {
         Main.map.HighlightTiles.Clear();
         if (positions != null)
         {
-            foreach (var possible_tile in positions) { Main.map.HighlightTiles.SetCellv(possible_tile.Vec2(), (int)TileType.Transparent_Green); }
+            foreach (var possible_tile in positions) { Main.map.HighlightTiles.SetCellv(possible_tile.Vec2(), (int)tileType); }
         }
     }
 

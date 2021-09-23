@@ -36,9 +36,9 @@ public class Game_Manager : Node2D
         set
         {
             if (Current_State.AllowWorldInput is false) { return; };
-            CurrentSelection?.HandleBeingUnselected();
+            CurrentSelection?.HandleUnselection();
             currentSelection = value;
-            CurrentSelection?.HandleBeingSelected();
+            CurrentSelection?.HandleSelection();
 
             string name = Helpers.NameAndType(currentSelection as INameable);
             if (value is null) { name = "null"; }
@@ -140,7 +140,7 @@ public class Game_Manager : Node2D
     }
 
     //End sprite move transition and return to previous state
-    public void EndSpriteMapObjectTransition(SpriteMapObject mapObject)
+    public void EndSpriteMapObjectTransition(SpriteMapObject spriteMapObject)
     {
         UpdateTurnObjects();
         if (Current_State is TransitionState)

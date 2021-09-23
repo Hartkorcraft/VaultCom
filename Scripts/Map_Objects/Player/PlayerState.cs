@@ -1,18 +1,70 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+using HartLib;
+using static HartLib.Utils;
 
-public abstract class PlayerActionBase
+public abstract class PlayerStateBase
 {
     public PlayerCharacter Player { get; private set; }
+
     public abstract void DoPlayerAction();
 
-    public PlayerActionBase(PlayerCharacter player)
+    public virtual void Start()
+    {
+
+    }
+
+    public virtual void UpdateDisplay()
+    {
+
+    }
+
+    public virtual void ClearDisplay()
+    {
+        Main.map.UpdateHightligthDisplay(null);
+    }
+
+    public PlayerStateBase(PlayerCharacter player)
     {
         Player = player;
+        Start();
     }
 }
 
-public class FindingPathAction : PlayerActionBase
-{
+// public class PlayerIdle : PlayerStateBase
+// {
+//     public override void DoPlayerAction()
+//     {
 
+//     }
+
+//     public PlayerIdle(PlayerCharacter p) : base(p) { }
+// }
+
+public class PlayerPrimaryActionState : PlayerStateBase
+{
+    public override void DoPlayerAction()
+    {
+
+    }
+
+    public override void UpdateDisplay()
+    {
+        Main.map?.UpdateHightligthDisplay(Player.posible_positions_tile_cache, TileType.Transparent_Orange);
+    }
+
+    public override void Start()
+    {
+        GD.Print("Changed to primary action");
+    }
+
+    public PlayerPrimaryActionState(PlayerCharacter p) : base(p) { }
+
+}
+
+public class PlayerFindingPathState : PlayerStateBase
+{
     public override void DoPlayerAction()
     {
         //Pathfinding
@@ -43,5 +95,18 @@ public class FindingPathAction : PlayerActionBase
             }
         }
     }
-    public FindingPathAction(PlayerCharacter p) : base(p) { }
+
+    public override void UpdateDisplay()
+    {
+        Main.map?.UpdateHightligthDisplay(Player.posible_positions_tile_cache);
+    }
+
+    public override void Start()
+    {
+        GD.Print("Changed to player finding path action");
+    }
+
+    public PlayerFindingPathState(PlayerCharacter p) : base(p) { }
+
 }
+

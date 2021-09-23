@@ -8,13 +8,23 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
 {
 
     public Vector2i lastMouseGridPos { get; private set; }
-
-    public PlayerActionBase CurrentAction { get; private set; }
+    private PlayerStateBase current_action;
+    public PlayerStateBase Default_Action { get; private set; }
+    public PlayerStateBase Current_Action
+    {
+        get { return current_action; }
+        private set
+        {
+            current_action = value;
+            current_action.Start();
+        }
+    }
 
     #region ENTER_TREE READY INPUT ETC
     public override void _EnterTree()
     {
         base._EnterTree();
+        Default_Action = new PlayerFindingPathState(this);
         GridPos = new Vector2i(Position / new Vector2(Main.TILE_SIZE, Main.TILE_SIZE));
         UI.primary_button_pressed += TryDoPrimaryAction;
     }
@@ -24,15 +34,6 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         base._ExitTree();
         UI.primary_button_pressed -= TryDoPrimaryAction;
     }
-
-    public void TryDoPrimaryAction()
-    {
-        if (Main.game_Manager?.CurrentSelection == this)
-        {
-            // primaryAction?.DoAction();
-        }
-    }
-
     public override void _Ready()
     {
         base._Ready();
@@ -44,9 +45,9 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         base._Process(delta);
         if (Main.game_Manager?.AllowWorldInput is true)
         {
-            if (Main.game_Manager?.CurrentSelection == this)
+            if (Main.game_Manager?.CurrentSelection == this && Current_Action != null)
             {
-                CurrentAction.DoPlayerAction();
+                Current_Action.DoPlayerAction();
             }
         }
         lastMouseGridPos = Main.Mouse_Grid_Pos;
@@ -66,6 +67,23 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         }
     }
     #endregion
+    public void TryDoPrimaryAction()
+    {
+        if (Main.game_Manager?.CurrentSelection == this)
+        {
+            if (Current_Action as PlayerPrimaryActionState is null)
+            {
+                Current_Action = new PlayerPrimaryActionState(this);
+            }
+            Current_Action?.UpdateDisplay();
+        }
+    }
+    
+    protected override void EndTransition()
+    {
+        base.EndTransition();
+        Current_Action.UpdateDisplay();
+    }
 
     #region  IMOUSEABLE 
     public override void On_Left_Mouse_Click()
@@ -88,18 +106,20 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
 
     public virtual void HandleSelection()
     {
-
+        Current_Action = Default_Action;
+        Current_Action.UpdateDisplay();
+        //Main.map?.UpdateHightligthDisplay(posible_positions_tile_cache);
     }
 
     public virtual void HandleBeingSelected()
     {
-        CurrentAction = new FindingPathAction(this);
-        Main.map?.UpdateHightligthDisplay(posible_positions_tile_cache);
+
     }
 
-    public virtual void HandleBeingUnselected()
+    public virtual void HandleUnselection()
     {
-        Main.map?.UpdateHightligthDisplay(null);
+        Current_Action.ClearDisplay();
+        //Main.map?.UpdateHightligthDisplay(null);
     }
     #endregion
 

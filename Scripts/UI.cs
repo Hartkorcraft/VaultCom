@@ -21,13 +21,11 @@ public class UI : CanvasLayer
 
     public void _on_PrimaryButton_button_down()
     {
-        GD.Print("pr button");
         primary_button_pressed?.Invoke();
     }
 
     public void _on_UseButton_button_down()
     {
-        GD.Print("use");
         use_button_pressed?.Invoke();
     }
 }
