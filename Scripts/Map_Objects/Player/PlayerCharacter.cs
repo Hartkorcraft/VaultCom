@@ -4,39 +4,48 @@ using System.Collections.Generic;
 using HartLib;
 using static HartLib.Utils;
 
-public class PlayerCharacter : Entity, ISelectable, IContextable
+public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
 {
-
+    public static int number_of_player_characters { get; private set; } = 0;
     public Vector2i lastMouseGridPos { get; private set; }
-    private PlayerStateBase current_action;
-    public PlayerStateBase Default_Action { get; private set; }
-    public PlayerStateBase Current_Action
+    private PlayerActivityBase current_action;
+    public PlayerActivityBase Default_Action { get; private set; }
+    public PlayerActivityBase Current_Action
     {
         get { return current_action; }
         private set
         {
             current_action = value;
-            current_action.Start();
+            current_action.Start(this);
         }
     }
+
+    public static PlayerFindingPathActivity player_finding_path_activity = new PlayerFindingPathActivity();
+    public static PlayerPrimaryActivity player_primary_activity = new PlayerPrimaryActivity();
+    public static PlayerIdleActivity player_idle_activity = new PlayerIdleActivity();
 
     #region ENTER_TREE READY INPUT ETC
     public override void _EnterTree()
     {
         base._EnterTree();
-        Default_Action = new PlayerFindingPathState(this);
+        number_of_player_characters++;
+        AddIGetInfoableToGameManager();
         GridPos = new Vector2i(Position / new Vector2(Main.TILE_SIZE, Main.TILE_SIZE));
+        Default_Action = player_finding_path_activity;
         UI.primary_button_pressed += TryDoPrimaryAction;
+        ObjectName += $"_{number_of_player_characters}";
     }
 
     public override void _ExitTree()
     {
         base._ExitTree();
+        number_of_player_characters--;
         UI.primary_button_pressed -= TryDoPrimaryAction;
     }
     public override void _Ready()
     {
         base._Ready();
+        Current_Action = Default_Action;
         GD.Print("Spawned at: " + Position);
     }
 
@@ -45,7 +54,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         base._Process(delta);
         if (Main.game_Manager?.AllowWorldInput is true)
         {
-            if (Main.game_Manager?.CurrentSelection == this && Current_Action != null)
+            if (Game_Manager.CurrentSelection == this && Current_Action != null)
             {
                 Current_Action.DoPlayerAction();
             }
@@ -67,23 +76,6 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
         }
     }
     #endregion
-    public void TryDoPrimaryAction()
-    {
-        if (Main.game_Manager?.CurrentSelection == this)
-        {
-            if (Current_Action as PlayerPrimaryActionState is null)
-            {
-                Current_Action = new PlayerPrimaryActionState(this);
-            }
-            Current_Action?.UpdateDisplay();
-        }
-    }
-    
-    protected override void EndTransition()
-    {
-        base.EndTransition();
-        Current_Action.UpdateDisplay();
-    }
 
     #region  IMOUSEABLE 
     public override void On_Left_Mouse_Click()
@@ -119,7 +111,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
     public virtual void HandleUnselection()
     {
         Current_Action.ClearDisplay();
-        //Main.map?.UpdateHightligthDisplay(null);
+        Current_Action = player_idle_activity;
     }
     #endregion
 
@@ -137,8 +129,47 @@ public class PlayerCharacter : Entity, ISelectable, IContextable
     }
     #endregion
 
+    public override void StartTurn()
+    {
+        base.StartTurn();
+        Current_Action = player_idle_activity;
+    }
+
+    public void TryDoPrimaryAction()
+    {
+        if (Game_Manager.CurrentSelection == this)
+        {
+            if (Current_Action as PlayerPrimaryActivity is null)
+            {
+                Current_Action = player_primary_activity;
+            }
+            Current_Action?.UpdateDisplay();
+        }
+    }
+
+    protected override void EndTransition()
+    {
+        base.EndTransition();
+        Current_Action.UpdateDisplay();
+    }
+
     public override void AddITurnableToGameManager()
     {
-        Main.game_Manager?.PlayerTurnObjects.Add(this);
+        Game_Manager.PlayerTurnObjects?.Add(this);
+    }
+
+    public string GetInfo()
+    {
+        return
+        $@"-Name: {ObjectName}
+        -Current_Action: {current_action?.ToString()}
+        -GridPos: {GridPos.ToString()}
+        -Health and Cap: {Health} {HealthCap}
+        -Movement points and Cap: {MovementPoints} {MovementPointsCap}";
+    }
+
+    public void AddIGetInfoableToGameManager()
+    {
+        Game_Manager.infoObjects?.Add(this);
     }
 }

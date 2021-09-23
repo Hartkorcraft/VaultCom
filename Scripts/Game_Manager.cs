@@ -1,17 +1,25 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HartLib;
 using static HartLib.Utils;
 
 public class Game_Manager : Node2D
 {
-    public GameState Current_State { get; private set; }
-    public GameState Previous_State { get; private set; }
+    public static GameState Current_State { get; private set; }
+    public static GameState Previous_State { get; private set; }
     public bool DebugConsoleOpen { get { return Main.debug_Manager.debugConsole.Visible; } }
     public bool AllowWorldInput { get { return Current_State.AllowWorldInput; } }
-    public HashSet<ITurnable> PlayerTurnObjects { get; } = new HashSet<ITurnable>();
-    public HashSet<ITurnable> NpcTurnObjects { get; } = new HashSet<ITurnable>();
+    public static HashSet<ITurnable> PlayerTurnObjects { get; } = new HashSet<ITurnable>();
+    public static HashSet<ITurnable> NpcTurnObjects { get; } = new HashSet<ITurnable>();
+    public static HashSet<IGetInfoable> infoObjects { get; } = new HashSet<IGetInfoable>();
+
+    public static HashSet<T> GetInfoObjectsOfType<T>()
+    {
+        return new HashSet<T>(infoObjects.OfType<T>());
+    }
+    public static HashSet<PlayerCharacter> GetPlayerInfoObjects() { return GetInfoObjectsOfType<PlayerCharacter>(); }
 
     public static event Action<GameState> changed_state_event;
     //public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
@@ -28,9 +36,37 @@ public class Game_Manager : Node2D
         Main.debug_Manager.UpdateLog("GameStates", "Current: " + Current_State.GetType().ToString() + " Previous: " + Previous_State.GetType().ToString());
     }
 
+    #region ENTER TREE, READY, PROCESS, INPUT etc.
+    public override void _EnterTree()
+    {
+        SpriteMapObject.end_transition_event += EndSpriteMapObjectTransition;
+        SpriteMapObject.moving_on_path_event += SetState;
+        SpriteMapObject.mouse_enter_over_event += AddMouseOverObject;
+        SpriteMapObject.mouse_exit_over_event += RemoveMouseOverObject;
+    }
+    public override void _ExitTree()
+    {
+        base._ExitTree();
+        SpriteMapObject.end_transition_event -= EndSpriteMapObjectTransition;
+        SpriteMapObject.moving_on_path_event -= SetState;
+        SpriteMapObject.mouse_enter_over_event -= AddMouseOverObject;
+        SpriteMapObject.mouse_exit_over_event -= RemoveMouseOverObject;
+    }
+    public override void _Ready()
+    {
+        Main.debug_Manager.AddLog(new DebugInfo("Current_Selection"));
+        Main.debug_Manager.AddLog(new DebugInfo("GameStates"));
+        SetState(new StartState());
+    }
+    public override void _Process(float delta)
+    {
+        Current_State.UpdateState();
+    }
+    #endregion
+
     #region SELECTION
-    private ISelectable currentSelection;
-    public ISelectable CurrentSelection
+    private static ISelectable currentSelection;
+    public static ISelectable CurrentSelection
     {
         get { return currentSelection; }
         set
@@ -96,35 +132,6 @@ public class Game_Manager : Node2D
     }
 
     #endregion
-
-    #region ENTER TREE, READY, PROCESS, INPUT etc.
-    public override void _EnterTree()
-    {
-        SpriteMapObject.end_transition_event += EndSpriteMapObjectTransition;
-        SpriteMapObject.moving_on_path_event += SetState;
-        SpriteMapObject.mouse_enter_over_event += AddMouseOverObject;
-        SpriteMapObject.mouse_exit_over_event += RemoveMouseOverObject;
-    }
-    public override void _ExitTree()
-    {
-        base._ExitTree();
-        SpriteMapObject.end_transition_event -= EndSpriteMapObjectTransition;
-        SpriteMapObject.moving_on_path_event -= SetState;
-        SpriteMapObject.mouse_enter_over_event -= AddMouseOverObject;
-        SpriteMapObject.mouse_exit_over_event -= RemoveMouseOverObject;
-    }
-    public override void _Ready()
-    {
-        Main.debug_Manager.AddLog(new DebugInfo("Current_Selection"));
-        Main.debug_Manager.AddLog(new DebugInfo("GameStates"));
-        SetState(new StartState());
-    }
-    public override void _Process(float delta)
-    {
-        Current_State.UpdateState();
-    }
-    #endregion
-
     public void _on_Next_Turn_Button_pressed()
     {
         GD.Print("Pressed next turn button!");
@@ -138,6 +145,8 @@ public class Game_Manager : Node2D
         else if (Current_State is NpcTurnState) { SetState(new PlayerTurnState()); }
         CurrentSelection = null;
     }
+
+    //public void PrintPlayerCharactersCurrentActivity() { foreach (var player in PlayerTurnObjects) { GD.Print((player as PlayerCharacter).Name + (player as PlayerCharacter).Current_Action?.ToString()); } }
 
     //End sprite move transition and return to previous state
     public void EndSpriteMapObjectTransition(SpriteMapObject spriteMapObject)

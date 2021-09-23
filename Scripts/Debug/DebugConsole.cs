@@ -22,9 +22,13 @@ public class DebugConsole : Control
         inputBox.GrabFocus();
     }
 
-    public void OutputText(string text)
+    public void OutputText(string text, bool add_new_line = true)
     {
-        outputBox.Text += "\n" + text;
+        if (add_new_line)
+        {
+            outputBox.Text += "\n";
+        }
+        outputBox.Text += text;
     }
 
     public void _on_input_text_entered(string new_text)

@@ -28,7 +28,6 @@ public abstract class Entity : SpriteMapObject, ITurnable
     public virtual void StartTurn()
     {
         ResetMovementPoints();
-
     }
 
     public virtual void CalculatePossiblePositions()

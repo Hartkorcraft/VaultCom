@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=2]
+[gd_scene load_steps=19 format=2]
 
 [ext_resource path="res://Scripts/Main.cs" type="Script" id=1]
 [ext_resource path="res://Scenes/Debug_Manager.tscn" type="PackedScene" id=2]
@@ -16,6 +16,7 @@
 [ext_resource path="res://Assets/Textures/UI/tempUseButtonHover.png" type="Texture" id=14]
 [ext_resource path="res://Assets/Textures/UI/tempPrimaryButtonHover.png" type="Texture" id=15]
 [ext_resource path="res://Scenes/PickUp.tscn" type="PackedScene" id=16]
+[ext_resource path="res://Assets/Fonts/DosFont.tres" type="DynamicFont" id=17]
 
 [sub_resource type="Environment" id=1]
 background_mode = 4
@@ -96,6 +97,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 margin_left = -230.0
 margin_top = -100.0
+custom_fonts/font = ExtResource( 17 )
 text = "next turn"
 __meta__ = {
 "_edit_use_anchors_": false

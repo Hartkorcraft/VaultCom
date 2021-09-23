@@ -10,6 +10,7 @@ public class ConsoleCommandsManager
     public static DebugCommand HELLO;
     public static DebugCommand<int, int> ADD;
     public static DebugCommand HELP;
+    public static DebugCommand GET_PLAYER_CHARACTER_INFO;
 
     private void AddCommands()
     {
@@ -17,7 +18,7 @@ public class ConsoleCommandsManager
         {
             console.OutputText("* Hello!");
         });
-        ADD = new DebugCommand<int, int>("add", "Adds numbers", "add<int,int>", (num1, num2) =>
+        ADD = new DebugCommand<int, int>("add", "Adds numbers", "add <int> <int>", (num1, num2) =>
         {
             console.OutputText($"* {(num1 + num2).ToString()}");
         });
@@ -30,12 +31,26 @@ public class ConsoleCommandsManager
                 console.OutputText($"- {commandBase.commandId} {commandBase.commandDescription} {commandBase.commandFormat}");
             }
         });
+        GET_PLAYER_CHARACTER_INFO = new DebugCommand("get_player_info", "prints IGetInfoAble Info", "get_player_info", () =>
+        {
+            var index = 0;
+
+            console.OutputText($"-Current selection: {Game_Manager.CurrentSelection?.ToString()}");
+            foreach (var player_character in Game_Manager.GetPlayerInfoObjects())
+            {
+                console.OutputText("---------------------------------------------------");
+                console.OutputText($"{index}. ");
+                console.OutputText($"{player_character.GetInfo()}");
+                index++;
+            }
+        });
 
         commandList = new List<object>
         {
             HELLO,
             ADD,
-            HELP
+            HELP,
+            GET_PLAYER_CHARACTER_INFO
         };
     }
 

@@ -18,11 +18,11 @@ public abstract class MapObject : Node2D, IHealth, INameable
         }
     }
     public string ObjectName { get; protected set; } = "Default_name";
-
-    #region IHEALTH
     public int HealthCap { get; set; } = 5;
     public int Health { get; set; } = 1;
 
+
+    #region IHEALTH
     public virtual void Damage(uint dmg)
     {
         if (Health - (int)dmg <= 0)

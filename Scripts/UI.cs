@@ -27,5 +27,11 @@ public class UI : CanvasLayer
     public void _on_UseButton_button_down()
     {
         use_button_pressed?.Invoke();
+
+        var playerObjects = Game_Manager.GetInfoObjectsOfType<PlayerCharacter>();
+        foreach (var player in playerObjects)
+        {
+            GD.Print(player.GetInfo());
+        }
     }
 }
