@@ -15,20 +15,16 @@ public abstract class PlayerActivityBase
         player_character = p;
     }
 
-    public virtual void UpdateDisplay()
-    {
+    public virtual void Exit() { }
 
-    }
+    public virtual void UpdateDisplay() { }
 
     public virtual void ClearDisplay()
     {
         Main.map?.UpdateHightligthDisplay(null);
     }
 
-    public PlayerActivityBase()
-    {
-
-    }
+    public PlayerActivityBase() { }
 }
 
 public class PlayerIdleActivity : PlayerActivityBase
@@ -66,8 +62,29 @@ public class PlayerPrimaryActivity : PlayerActivityBase
     }
 
     public PlayerPrimaryActivity() : base() { }
-
 }
+
+public class PlayerUseActivity : PlayerActivityBase
+{
+    public override void DoPlayerAction()
+    {
+
+    }
+
+    public override void UpdateDisplay()
+    {
+        Main.map?.UpdateHightligthDisplay(player_character.posible_positions_tile_cache, TileType.Red_Dot);
+    }
+
+    public override void Start(PlayerCharacter p)
+    {
+        base.Start(p);
+        GD.Print("Changed to use action");
+    }
+
+    public PlayerUseActivity() : base() { }
+}
+
 
 public class PlayerFindingPathActivity : PlayerActivityBase
 {

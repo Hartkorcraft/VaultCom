@@ -9,12 +9,15 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
     public static int number_of_player_characters { get; private set; } = 0;
     public Vector2i lastMouseGridPos { get; private set; }
     private PlayerActivityBase current_action;
+    private PlayerActivityBase previous_action = null;
     public PlayerActivityBase Default_Action { get; private set; }
     public PlayerActivityBase Current_Action
     {
         get { return current_action; }
         private set
         {
+            if (current_action == value) { return; }
+            previous_action = current_action;
             current_action = value;
             current_action.Start(this);
         }
@@ -22,6 +25,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
 
     public static PlayerFindingPathActivity player_finding_path_activity = new PlayerFindingPathActivity();
     public static PlayerPrimaryActivity player_primary_activity = new PlayerPrimaryActivity();
+    public static PlayerUseActivity player_use_activity = new PlayerUseActivity();
     public static PlayerIdleActivity player_idle_activity = new PlayerIdleActivity();
 
     #region ENTER_TREE READY INPUT ETC
@@ -33,6 +37,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         GridPos = new Vector2i(Position / new Vector2(Main.TILE_SIZE, Main.TILE_SIZE));
         Default_Action = player_finding_path_activity;
         UI.primary_button_pressed += TryDoPrimaryAction;
+        UI.use_button_pressed += TryDoUseAction;
         ObjectName += $"_{number_of_player_characters}";
     }
 
@@ -41,6 +46,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         base._ExitTree();
         number_of_player_characters--;
         UI.primary_button_pressed -= TryDoPrimaryAction;
+        UI.use_button_pressed -= TryDoUseAction;
     }
     public override void _Ready()
     {
@@ -135,14 +141,31 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         Current_Action = player_idle_activity;
     }
 
+    public PlayerActivityBase ChangeToPreviousAction()
+    {
+        if (previous_action != null) { return Current_Action = previous_action; }
+        else { return Current_Action = Default_Action; }
+    }
+    public PlayerActivityBase ChangeToDefaultAction()
+    {
+        return Current_Action = Default_Action;
+    }
+
     public void TryDoPrimaryAction()
     {
         if (Game_Manager.CurrentSelection == this)
         {
-            if (Current_Action as PlayerPrimaryActivity is null)
-            {
-                Current_Action = player_primary_activity;
-            }
+            if (Current_Action as PlayerPrimaryActivity is null) { Current_Action = player_primary_activity; }
+            else { Current_Action = ChangeToDefaultAction(); }
+            Current_Action?.UpdateDisplay();
+        }
+    }
+    public void TryDoUseAction()
+    {
+        if (Game_Manager.CurrentSelection == this)
+        {
+            if (Current_Action as PlayerUseActivity is null) { Current_Action = player_use_activity; }
+            else { Current_Action = ChangeToDefaultAction(); }
             Current_Action?.UpdateDisplay();
         }
     }
@@ -161,11 +184,11 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
     public string GetInfo()
     {
         return
-        $@"-Name: {ObjectName}
+        $@"*Name: {ObjectName}
         -Current_Action: {current_action?.ToString()}
         -GridPos: {GridPos.ToString()}
-        -Health and Cap: {Health} {HealthCap}
-        -Movement points and Cap: {MovementPoints} {MovementPointsCap}";
+        -Health and Cap: {Health}/{HealthCap}
+        -Movement points and Cap: {MovementPoints}/{MovementPointsCap}";
     }
 
     public void AddIGetInfoableToGameManager()

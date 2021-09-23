@@ -35,7 +35,7 @@ public class ConsoleCommandsManager
         {
             var index = 0;
 
-            console.OutputText($"-Current selection: {Game_Manager.CurrentSelection?.ToString()}");
+            console.OutputText($"*Current selection: {Game_Manager.CurrentSelection?.ToString()}");
             foreach (var player_character in Game_Manager.GetPlayerInfoObjects())
             {
                 console.OutputText("---------------------------------------------------");

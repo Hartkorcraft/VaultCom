@@ -1,7 +1,11 @@
-[gd_scene load_steps=3 format=2]
+[gd_scene load_steps=5 format=2]
 
 [ext_resource path="res://Scripts/Debug/Debug_Manager.cs" type="Script" id=1]
 [ext_resource path="res://Scenes/DebugConsole.tscn" type="PackedScene" id=2]
+[ext_resource path="res://Assets/Fonts/Perfect DOS VGA 437 Win.ttf" type="DynamicFontData" id=3]
+
+[sub_resource type="DynamicFont" id=1]
+font_data = ExtResource( 3 )
 
 [node name="Debug_Manager" type="Control"]
 script = ExtResource( 1 )
@@ -12,6 +16,8 @@ __meta__ = {
 [node name="DebugInfoLabel" type="Label" parent="."]
 margin_right = 40.0
 margin_bottom = 14.0
+custom_fonts/font = SubResource( 1 )
+text = "Debug label info test"
 __meta__ = {
 "_edit_use_anchors_": false
 }
