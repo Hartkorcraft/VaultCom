@@ -12,17 +12,16 @@ public class SpriteMapObject : MapObject, IMouseable
     public static event Action<SpriteMapObject> mouse_enter_over_event;
     public static event Action<SpriteMapObject> mouse_exit_over_event;
 
-    private List<Vector2i> transition_positions = new List<Vector2i>();
-    [Export] private float Transition_Speed = 0.3f;
-    private bool transitioning;
-    public bool Transitioning
-    {
-        get { return transitioning; }
-        set { transitioning = value; }
-    }
-    public Area2D area2D { get; private set; }
+    public bool Transitioning { get => transitioning; set => transitioning = value; }
     public HashSet<TileType> blocking_movement { get; protected set; } = new HashSet<TileType>();
-    
+    public Area2D area2D { get; private set; } //IMouseable
+
+    [Export] private float Transition_Speed = 0.3f;
+
+    private List<Vector2i> transition_positions = new List<Vector2i>(); // Positions for moving on a path
+    private bool transitioning;
+
+
     #region  ENTER_TREE READY ETC.
     public override void _EnterTree()
     {
@@ -39,10 +38,11 @@ public class SpriteMapObject : MapObject, IMouseable
     {
         Transition_Position_Lerp(Transition_Speed);
     }
-
     #endregion
 
     #region MOVEABLE 
+
+    public bool InClipRange(Vector2 new_pos, float clip_range) => (Mathf.Abs(Position.x - new_pos.x) <= clip_range && Mathf.Abs(Position.y - new_pos.y) <= clip_range);
 
     protected void Transition_Position_Lerp(float smooth = 0.3f, float clip_range = 1f)
     {
@@ -50,15 +50,11 @@ public class SpriteMapObject : MapObject, IMouseable
         {
             var new_grid_pos = (Vector2i)transition_positions[0];
             Vector2 new_pos = new_grid_pos.Vec2() * Main.TILE_SIZE;
-            if (Mathf.Abs(Position.x - new_pos.x) <= clip_range && Mathf.Abs(Position.y - new_pos.y) <= clip_range)
+            if (InClipRange(new_pos, clip_range))
             {
                 transition_positions.RemoveAt(0);
                 GridPos = new_grid_pos;
-                if (transition_positions.Count <= 0)
-                {
-                    EndTransition();
-                    //Main.game_Manager.EndSpriteMapObjectTransition(this);
-                }
+                if (transition_positions.Count <= 0) { EndTransition(); }
             }
             Position = Lerp(Position, new_pos, smooth);
         }
@@ -67,16 +63,13 @@ public class SpriteMapObject : MapObject, IMouseable
     protected virtual void EndTransition()
     {
         end_transition_event?.Invoke(this);
-
     }
 
     public void MoveOnPath(List<Vector2i> positions)
     {
-        //Main.game_Manager.SetState(new TransitionState());
         moving_on_path_event?.Invoke(new TransitionState());
         transition_positions.AddRange(positions);
     }
-
     #endregion
 
     #region  IMOUSEABLE 
@@ -98,15 +91,8 @@ public class SpriteMapObject : MapObject, IMouseable
         }
     }
 
-    public virtual void On_Left_Mouse_Click()
-    {
-        //GD.Print("Clicked on map object LB");
-    }
-
-    public virtual void On_Right_Mouse_Click()
-    {
-        //GD.Print("Clicked on map object RB");
-    }
+    public virtual void On_Left_Mouse_Click() { }
+    public virtual void On_Right_Mouse_Click() { }
 
     public virtual void _on_Area2D_mouse_entered()
     {

@@ -4,16 +4,24 @@ using System.Collections.Generic;
 using HartLib;
 using static HartLib.Utils;
 
-public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
+public class PlayerCharacter : Entity, ISelectable, IGetInfoable
 {
     public static int number_of_player_characters { get; private set; } = 0;
+
     public Vector2i lastMouseGridPos { get; private set; }
+    public PlayerActivityBase Default_Action { get; private set; }
+    public PlayerPathfindingActivity player_finding_path_activity { get; protected set; }
+    public PlayerPrimaryActivity player_primary_activity { get; protected set; }
+    public PlayerUseActivity player_use_activity { get; protected set; }
+    public PlayerIdleActivity player_idle_activity { get; protected set; }
+    public List<Vector2i> path_positions_cache { get; protected set; } = new List<Vector2i>();
+
     private PlayerActivityBase current_action;
     private PlayerActivityBase previous_action = null;
-    public PlayerActivityBase Default_Action { get; private set; }
+
     public PlayerActivityBase Current_Action
     {
-        get { return current_action; }
+        get => current_action;
         private set
         {
             if (current_action == value) { return; }
@@ -23,15 +31,6 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
             if (current_action.Updated is false) { current_action.UpdateCalculations(); }
         }
     }
-    public bool CanSelect { get; set; } = true; //ISelectable
-
-    public PlayerPathfindingActivity player_finding_path_activity { get; protected set; }
-    public PlayerPrimaryActivity player_primary_activity { get; protected set; }
-    public PlayerUseActivity player_use_activity { get; protected set; }
-    public PlayerIdleActivity player_idle_activity { get; protected set; }
-
-    public List<Vector2i> path_positions_cache { get; protected set; } = new List<Vector2i>();
-    //public List<Vector2i> posible_positions_tile_cache { get; protected set; } = new List<Vector2i>();
 
     public List<Vector2i> Get_Posible_Moves()
     {
@@ -39,7 +38,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         return player_finding_path_activity.positions_cache;
     }
 
-    #region ENTER_TREE READY INPUT ETC
+    #region ENTER_TREE READY ETC
     public override void _EnterTree()
     {
         base._EnterTree();
@@ -84,6 +83,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         }
         lastMouseGridPos = Main.Mouse_Grid_Pos;
     }
+    #endregion
 
     public override void _Input(InputEvent inputEvent)
     {
@@ -98,13 +98,12 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
             }
         }
     }
-    #endregion
 
     #region  IMOUSEABLE 
     public override void On_Left_Mouse_Click()
     {
         base.On_Left_Mouse_Click();
-        if (Main.game_Manager?.AllowWorldInput is true) // Main.game_Manager.ContextMenuSafeCheck)
+        if (Main.game_Manager?.AllowWorldInput is true)
         {
             Main.game_Manager?.Select(this, true);
         }
@@ -116,49 +115,21 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
     }
     #endregion
 
-    #region ISELECTABLE
-
-    public virtual void HandleSelection()
+    #region ISelectable
+    public override void HandleSelection()
     {
         Current_Action = Default_Action;
         Current_Action.ShowCurrentDisplay();
-        //Main.map?.UpdateHightligthDisplay(posible_positions_tile_cache);
     }
 
-    public virtual void HandleBeingSelected()
-    {
-
-    }
-
-    public virtual void HandleUnselection()
+    public override void HandleUnselection()
     {
         Current_Action.Clear_Hightlight_Display();
         Current_Action = player_idle_activity;
     }
     #endregion
 
-    #region IContextable
-    public void Act_On_Context_Selection(ContextMenu popupMenu)
-    {
-        GD.Print("Acted on context selection!");
-
-        // var popupBoxScene = (PackedScene)ResourceLoader.Load("res://Scenes/PopupInfoWindow.tscn");
-        // PopupInfoWindow popupBox = (PopupInfoWindow)popupBoxScene.Instance();
-        // Main.ui.Opened_UI.AddChild(popupBox);
-
-        // popupBox.PopupCentered();
-        popupMenu.Close();
-    }
-    #endregion
-
-    // #region IMoveable
-    // // public virtual void CalculatePossiblePositions()
-    // // {
-    // //     posible_positions_tile_cache = Main.map?.PathFinding.FindPossibleSpaces(GridPos, MovementPoints, blocking_movement, 1);
-    // // }
-
-    // #endregion
-
+    #region ITurnable
     public override void UpdateTurnObject()
     {
         base.UpdateTurnObject();
@@ -173,16 +144,17 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         Current_Action = player_idle_activity;
     }
 
+    public override void AddITurnableToGameManager() { Game_Manager.PlayerTurnObjects?.Add(this); }
+    #endregion
+
+    #region PlayerActivites
     public PlayerActivityBase ChangeToPreviousAction()
     {
         if (previous_action != null) { return Current_Action = previous_action; }
         else { return Current_Action = Default_Action; }
     }
 
-    public PlayerActivityBase ChangeToDefaultAction()
-    {
-        return Current_Action = Default_Action;
-    }
+    public PlayerActivityBase ChangeToDefaultAction() => Current_Action = Default_Action;
 
     public void Set_Action_Updated_Flag_To_False()
     {
@@ -201,6 +173,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
             Current_Action?.ShowCurrentDisplay();
         }
     }
+
     public void TryDoUseAction()
     {
         if (Game_Manager.CurrentSelection == this)
@@ -210,6 +183,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
             Current_Action?.ShowCurrentDisplay();
         }
     }
+    #endregion
 
     protected override void EndTransition()
     {
@@ -218,11 +192,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         Current_Action.ShowCurrentDisplay();
     }
 
-    public override void AddITurnableToGameManager()
-    {
-        Game_Manager.PlayerTurnObjects?.Add(this);
-    }
-
+    #region IGetInfoable
     public string GetInfo()
     {
         return
@@ -237,4 +207,5 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
     {
         Game_Manager.infoObjects?.Add(this);
     }
+    #endregion
 }

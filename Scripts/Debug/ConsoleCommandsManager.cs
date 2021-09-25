@@ -11,6 +11,7 @@ public class ConsoleCommandsManager
     public static DebugCommand<int, int> ADD;
     public static DebugCommand HELP;
     public static DebugCommand GET_PLAYER_CHARACTER_INFO;
+    public static DebugCommand CLEAR_CONSOLE;
 
     private void AddCommands()
     {
@@ -18,10 +19,12 @@ public class ConsoleCommandsManager
         {
             console.OutputText("* Hello!");
         });
+
         ADD = new DebugCommand<int, int>("add", "Adds numbers", "add <int> <int>", (num1, num2) =>
         {
             console.OutputText($"* {(num1 + num2).ToString()}");
         });
+
         HELP = new DebugCommand("help", "Prints commands and other help", "help", () =>
         {
             console.OutputText("* Available Commands:");
@@ -31,6 +34,7 @@ public class ConsoleCommandsManager
                 console.OutputText($"- {commandBase.commandId} {commandBase.commandDescription} {commandBase.commandFormat}");
             }
         });
+
         GET_PLAYER_CHARACTER_INFO = new DebugCommand("get_player_info", "prints IGetInfoAble Info", "get_player_info", () =>
         {
             var index = 0;
@@ -45,12 +49,18 @@ public class ConsoleCommandsManager
             }
         });
 
+        CLEAR_CONSOLE = new DebugCommand("clear_console", "clears console", "clear_console", () =>
+        {
+            console.Clear();
+        });
+
         commandList = new List<object>
         {
             HELLO,
             ADD,
             HELP,
-            GET_PLAYER_CHARACTER_INFO
+            GET_PLAYER_CHARACTER_INFO,
+            CLEAR_CONSOLE
         };
     }
     public bool HandleInput(string input)

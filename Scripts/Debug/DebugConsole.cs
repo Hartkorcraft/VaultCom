@@ -14,12 +14,18 @@ public class DebugConsole : Control
         consoleManager = new ConsoleCommandsManager(Main.debug_Manager, this);
         outputBox = (TextEdit)GetNode("Output");
         inputBox = (LineEdit)GetNode("Input");
+        outputBox.Text = "";
     }
 
     public override void _Ready()
     {
         base._Ready();
         inputBox.GrabFocus();
+    }
+
+    public void Clear()
+    {
+        outputBox.Text = "";
     }
 
     public void OutputText(string text, bool add_new_line = true)

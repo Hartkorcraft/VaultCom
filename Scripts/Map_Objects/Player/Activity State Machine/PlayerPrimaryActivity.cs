@@ -7,6 +7,10 @@ using static HartLib.Utils;
 
 public class PlayerPrimaryActivity : PlayerActivityBase
 {
+    public override void Start()
+    {
+        if (LogChangesInGodot) { GD.Print("Changed to primary action"); }
+    }
     public override void DoPlayerActionProcess()
     {
 
@@ -17,11 +21,10 @@ public class PlayerPrimaryActivity : PlayerActivityBase
         Main.map?.Update_Higthlight_Display(player_character.Get_Posible_Moves(), TileType.Transparent_Orange);
     }
 
-    public override void Start()
+    public override void UpdateCalculations()
     {
-        GD.Print("Changed to primary action");
-    }
 
+    }
     public PlayerPrimaryActivity(PlayerCharacter p) : base(p) { }
 }
 

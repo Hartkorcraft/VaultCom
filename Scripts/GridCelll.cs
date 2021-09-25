@@ -6,28 +6,30 @@ using static HartLib.Utils;
 
 public class GridCell
 {
-    private Vector2i gridPos;
-    public Vector2i GridPos { get { return gridPos; } private set { gridPos = value; } }
+    public Vector2i GridPos { get; private set; }
+
     private TileType floorTile;
+    private TileType midTile;
+
     public TileType FloorTile
     {
-        get { return floorTile; }
+        get => floorTile;
         set
         {
             floorTile = value;
             Main.map?.FloorTiles.SetCellv(GridPos.Vec2(), (int)floorTile);
         }
     }
-    private TileType midTile;
     public TileType MidTile
     {
-        get { return midTile; }
+        get => midTile;
         set
         {
             midTile = value;
             Main.map?.MidTiles.SetCellv(GridPos.Vec2(), (int)midTile);
         }
     }
+
     public GridCell(Vector2i _gridPos, TileType _floorTile = TileType.Grass, TileType _midTile = TileType.Empty)
     {
         GridPos = _gridPos;

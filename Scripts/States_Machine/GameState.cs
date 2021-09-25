@@ -8,8 +8,10 @@ public abstract class GameState
 {
     protected static Game_Manager game_manager = Main.game_Manager;
 
-    //public virtual bool AllowWorldInput { get; set; } = true;
+    public virtual bool CanSelect { get; set; } = true;
+
     protected bool allowWorldInput = true;
+
     public virtual bool AllowWorldInput
     {
         get
@@ -17,26 +19,14 @@ public abstract class GameState
             if (game_manager != null) { return allowWorldInput && !game_manager.DebugConsoleOpen; } //game_manager.ContextMenuOpen; }
             return allowWorldInput;
         }
-        set { allowWorldInput = value; }
+        set => allowWorldInput = value;
     }
-
-    public virtual bool CanSelect { get; set; } = true;
 
 
     #region READY UPDATE EXIT 
-    public virtual void ReadyState()
-    {
-        GD.Print("Entered " + GetType().ToString() + " state");
-    }
-
-    public virtual void UpdateState()
-    {
-        Game_Manager.CurrentSelection?.HandleBeingSelected();
-    }
-    public virtual void ExitState()
-    {
-        //GD.Print("Exited " + GetType().ToString() + " state");
-    }
+    public virtual void ReadyState() { GD.Print("Entered " + GetType().ToString() + " state"); }
+    public virtual void UpdateState() { Game_Manager.CurrentSelection?.HandleBeingSelected(); }
+    public virtual void ExitState() { }
     #endregion
 
 

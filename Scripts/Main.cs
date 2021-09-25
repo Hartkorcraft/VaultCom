@@ -11,18 +11,18 @@ public class Main : Node2D
     public static Debug_Manager debug_Manager { get; private set; }
     public static Game_Manager game_Manager { get; private set; }
     public static UI ui { get; private set; }
-    [Export] Vector2 initMapSize = new Vector2(5, 5);
-    //public static ContextMenu context_menu { get; private set; }
+    public static Vector2i Last_Clicked_Grid_Pos { get; private set; } = new Vector2i(-1, -1);
+    public static int TILE_SIZE { get; private set; }
+    public static Vector2 Mouse_Pos => main.GetGlobalMousePosition();
+    public static Vector2i Mouse_Grid_Pos => MouseToCart(Mouse_Pos, Main.map.FloorTiles);
+
+    [Export] private Vector2 initMapSize = new Vector2(5, 5);
 
     public Vector2i InitMapSize
     {
-        get { return new Vector2i(initMapSize); }
+        get => new Vector2i(initMapSize);
         set { initMapSize.x = value.x; initMapSize.y = value.y; }
     }
-    public static Vector2 Mouse_Pos { get { return main.GetGlobalMousePosition(); } }
-    public static Vector2i Mouse_Grid_Pos { get { return MouseToCart(Mouse_Pos, Main.map.FloorTiles); } }
-    public static Vector2i Last_Clicked_Grid_Pos { get; private set; } = new Vector2i(-1, -1);
-    public static int TILE_SIZE { get; private set; }
 
     public static List<Godot.Collections.Dictionary> Get_Collider_Dicts_From_GridPos(Vector2i _pos, uint layer = 2147483647)
     {
@@ -78,7 +78,6 @@ public class Main : Node2D
         "Floor: " + map.GetTileType(Mouse_Grid_Pos, map.FloorTiles).ToString() + " | " +
         "Mid: " + map.GetTileType(Mouse_Grid_Pos, map.MidTiles).ToString());
     }
-
     #endregion
 
     #region INPUT 
@@ -108,7 +107,5 @@ public class Main : Node2D
     {
 
     }
-
-
     #endregion
 }

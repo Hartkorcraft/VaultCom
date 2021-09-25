@@ -3,11 +3,9 @@ using System;
 using System.Collections.Generic;
 public class UI : CanvasLayer
 {
-
     public TextureButton PrimaryButton { get; private set; }
     public TextureButton UseButton { get; private set; }
     public Control Opened_UI { get; private set; }
-    //public HashSet<Popup> MouseOverPopup { get; } = new HashSet<Popup>();
 
     public static event Action primary_button_pressed;
     public static event Action use_button_pressed;

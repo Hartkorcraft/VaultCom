@@ -4,8 +4,7 @@ public interface IHealth
 {
     int HealthCap { get; set; }
     int Health { get; set; }
-    void Damage(uint dmg);
-    void Heal(uint health);
+    void Damage(int dmg);
+    void Heal(int health);
     void Kill();
-
 }

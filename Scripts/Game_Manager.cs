@@ -9,24 +9,18 @@ public class Game_Manager : Node2D
 {
     public static GameState Current_State { get; private set; }
     public static GameState Previous_State { get; private set; }
-    public bool DebugConsoleOpen { get { return Main.debug_Manager.debugConsole.Visible; } }
-    public bool AllowWorldInput { get { return Current_State.AllowWorldInput; } }
     public static HashSet<ITurnable> PlayerTurnObjects { get; } = new HashSet<ITurnable>();
     public static HashSet<ITurnable> NpcTurnObjects { get; } = new HashSet<ITurnable>();
     public static HashSet<IGetInfoable> infoObjects { get; } = new HashSet<IGetInfoable>();
+    public static HashSet<T> GetInfoObjectsOfType<T>() => new HashSet<T>(infoObjects.OfType<T>());
+    public static HashSet<PlayerCharacter> GetPlayerInfoObjects() => GetInfoObjectsOfType<PlayerCharacter>();
+    public static event Action<GameState> changed_state_event;
 
-    public static HashSet<T> GetInfoObjectsOfType<T>()
-    {
-        return new HashSet<T>(infoObjects.OfType<T>());
-    }
-    public static HashSet<PlayerCharacter> GetPlayerInfoObjects() { return GetInfoObjectsOfType<PlayerCharacter>(); }
+    public bool DebugConsoleOpen => Main.debug_Manager.debugConsole.Visible;
+    public bool AllowWorldInput => Current_State.AllowWorldInput;
+    public HashSet<IMouseable> Mouseover { get; private set; } = new HashSet<IMouseable>();
 
     private static ISelectable currentSelection;
-
-    public static event Action<GameState> changed_state_event;
-    //public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
-    //public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
-
 
     public void SetState(GameState new_game_state)
     {
@@ -46,6 +40,7 @@ public class Game_Manager : Node2D
         SpriteMapObject.mouse_enter_over_event += AddMouseOverObject;
         SpriteMapObject.mouse_exit_over_event += RemoveMouseOverObject;
     }
+
     public override void _ExitTree()
     {
         base._ExitTree();
@@ -54,19 +49,20 @@ public class Game_Manager : Node2D
         SpriteMapObject.mouse_enter_over_event -= AddMouseOverObject;
         SpriteMapObject.mouse_exit_over_event -= RemoveMouseOverObject;
     }
+
     public override void _Ready()
     {
         Main.debug_Manager.AddLog(new DebugInfo("Current_Selection"));
         Main.debug_Manager.AddLog(new DebugInfo("GameStates"));
         SetState(new StartState());
     }
+
     public override void _Process(float delta)
     {
         Current_State.UpdateState();
     }
     #endregion
 
-    #region SELECTION
     public static ISelectable CurrentSelection
     {
         get { return currentSelection; }
@@ -91,14 +87,25 @@ public class Game_Manager : Node2D
         CurrentSelection = selection;
     }
 
-    #endregion
 
     #region MOUSE OVER
-    public HashSet<IMouseable> Mouseover { get; private set; } = new HashSet<IMouseable>();
     public void AddMouseOverObject(IMouseable imouseable) { Mouseover.Add(imouseable); }
     public void RemoveMouseOverObject(IMouseable imouseable) { Mouseover.Remove(imouseable); }
 
-    public void StartPlayerTurn()
+    public string GetMouseOverHashSetString()
+    {
+        string imouseableObjects = "";
+        foreach (var imouseable in Mouseover)
+        {
+            imouseableObjects += imouseable.ToString() + " " + imouseable.GetType().Name + ", ";
+        }
+        return imouseableObjects;
+    }
+
+    #endregion
+
+    #region TURN
+      public void StartPlayerTurn()
     {
         foreach (ITurnable playerObject in PlayerTurnObjects) { playerObject.StartTurn(); }
         UpdateTurnObjects();
@@ -121,18 +128,9 @@ public class Game_Manager : Node2D
             playerObject.UpdateTurnObject();
         }
     }
-
-    public string GetMouseOverHashSetString()
-    {
-        string imouseableObjects = "";
-        foreach (var imouseable in Mouseover)
-        {
-            imouseableObjects += imouseable.ToString() + " " + imouseable.GetType().Name + ", ";
-        }
-        return imouseableObjects;
-    }
-
     #endregion
+    
+    //TODO Put it in UI and add delegate 
     public void _on_Next_Turn_Button_pressed()
     {
         GD.Print("Pressed next turn button!");
@@ -147,8 +145,6 @@ public class Game_Manager : Node2D
         CurrentSelection = null;
     }
 
-    //public void PrintPlayerCharactersCurrentActivity() { foreach (var player in PlayerTurnObjects) { GD.Print((player as PlayerCharacter).Name + (player as PlayerCharacter).Current_Action?.ToString()); } }
-
     //End sprite move transition and return to previous state
     public void EndSpriteMapObjectTransition(SpriteMapObject spriteMapObject)
     {
@@ -160,5 +156,4 @@ public class Game_Manager : Node2D
         }
         else { throw new Exception("Not transitioning?!"); }
     }
-
 }

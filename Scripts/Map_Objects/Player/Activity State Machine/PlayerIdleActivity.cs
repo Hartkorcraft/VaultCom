@@ -6,15 +6,15 @@ using static HartLib.Utils;
 
 public class PlayerIdleActivity : PlayerActivityBase
 {
-    public override void DoPlayerActionProcess()
-    {
-
-    }
-
     public override void Start()
     {
-        GD.Print("Changed to idle action");
+        if (LogChangesInGodot) { GD.Print("Changed to idle action"); }
     }
+    public override void DoPlayerActionProcess() { }
+
+    public override void ShowCurrentDisplay() { }
+
+    public override void UpdateCalculations() { }
 
     public PlayerIdleActivity(PlayerCharacter p) : base(p) { }
 }

@@ -11,9 +11,28 @@ public class Map
     public TileMap PathfindingTiles { get; private set; }
     public TileMap HighlightTiles { get; private set; }
     public Vector2ui MapSize { get; private set; } = new Vector2ui(10, 10);
-    private GridCell[,] gridMap;
     public PathFinding<TileType> PathFinding { get; private set; }
 
+    private GridCell[,] gridMap;
+
+    public bool OnMap(Vector2i pos) => CheckIfInRange(pos, MapSize.Vec2i());
+
+    public GridCell GetGridCell(Vector2i gridPos)
+    {
+        if (OnMap(gridPos)) { return gridMap[gridPos.x, gridPos.y]; }
+        return null;
+    }
+
+    public TileType GetTileType(Vector2i gridPos, TileMap tileMap) => (TileType)tileMap.GetCellv(gridPos.Vec2());
+
+    public void Update_Higthlight_Display(List<Vector2i> positions, TileType tileType = TileType.Transparent_Green)
+    {
+        Main.map.HighlightTiles.Clear();
+        if (positions != null)
+        {
+            foreach (var possible_tile in positions) { Main.map.HighlightTiles.SetCellv(possible_tile.Vec2(), (int)tileType); }
+        }
+    }
     public void InitGridMap(Vector2ui _MapSize, bool clear = true)
     {
         if (clear)
@@ -36,66 +55,6 @@ public class Map
         }
     }
 
-    public void Update_Higthlight_Display(List<Vector2i> positions, TileType tileType = TileType.Transparent_Green)
-    {
-        Main.map.HighlightTiles.Clear();
-        if (positions != null)
-        {
-            foreach (var possible_tile in positions) { Main.map.HighlightTiles.SetCellv(possible_tile.Vec2(), (int)tileType); }
-        }
-    }
-
-    #region GET / SET   Tiles / Cells 
-    public GridCell GetGridCell(Vector2i gridPos)
-    {
-        if (CheckIfInRange(gridPos, MapSize)) { return gridMap[gridPos.x, gridPos.y]; }
-        return null;
-    }
-
-    public TileType GetTileType(Vector2i gridPos, TileMap tileMap)
-    {
-        return (TileType)tileMap.GetCellv(gridPos.Vec2());
-    }
-
-    public TileType GetFloorTileType(Vector2i gridPos)
-    {
-        if (CheckIfInRange(gridPos, MapSize.Vec2i()))
-        {
-            return gridMap[gridPos.x, gridPos.y].FloorTile;
-        }
-        return TileType.Empty;
-    }
-
-    public void SetTileFloor(Vector2i gridPos, TileType type)
-    {
-        if (CheckIfInRange(gridPos, MapSize.Vec2i()))
-        {
-            gridMap[gridPos.x, gridPos.y].FloorTile = type;
-        }
-    }
-    public TileType GetMidTileType(Vector2i gridPos)
-    {
-        if (CheckIfInRange(gridPos, MapSize.Vec2i()))
-        {
-            return gridMap[gridPos.x, gridPos.y].MidTile;
-        }
-        return TileType.Empty;
-    }
-
-    public void SetTileMid(Vector2i gridPos, TileType type)
-    {
-        if (CheckIfInRange(gridPos, MapSize.Vec2i()))
-        {
-            gridMap[gridPos.x, gridPos.y].MidTile = type;
-        }
-    }
-    #endregion
-
-    public bool OnMap(Vector2i pos)
-    {
-        return CheckIfInRange(pos, MapSize.Vec2i());
-    }
-
     public Map(Vector2ui _mapSize)
     {
         var Tiles = Main.main.GetNode("Tiles");
@@ -111,7 +70,9 @@ public class Map
             return
             blocking.Contains((TileType)MidTiles.GetCellv(pos.Vec2()));
         };
+
         Func<Vector2i, int, bool> check_for_colliders = (pos, layer) => { return Main.Get_Collider_Dicts_From_GridPos(pos, 1).Count > 0; };
+
         PathFinding = new PathFinding<TileType>(new Vector2i(_mapSize), checkForBlocking, check_for_colliders);
     }
 }

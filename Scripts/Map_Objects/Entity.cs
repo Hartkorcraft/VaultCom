@@ -4,19 +4,16 @@ using System.Collections.Generic;
 using HartLib;
 using static HartLib.Utils;
 
-public abstract class Entity : SpriteMapObject, ITurnable
+public abstract class Entity : SpriteMapObject, ITurnable, ISelectable
 {
     public int MovementPointsCap { get; set; } = 5;
     public int MovementPoints { get; set; } = 5;
-    // public List<Vector2i> path_positions_cache { get; protected set; } = new List<Vector2i>();
-    // public List<Vector2i> posible_positions_tile_cache { get; protected set; } = new List<Vector2i>();
-    //public List<Vector2i> posible_primary_actions_tile_cache { get; protected set; } = new List<Vector2i>();
+    public bool CanSelect { get; set; } = true; //ISelectable
 
-    public void ResetMovementPoints() { MovementPoints = MovementPointsCap; }
+    public void ResetMovementPoints() { MovementPoints = MovementPointsCap; }  //ITurnable
+    public abstract void AddITurnableToGameManager(); //ITurnable
 
-
-    public abstract void AddITurnableToGameManager();
-
+    #region ENTER EXIT ETC.
     public override void _EnterTree()
     {
         base._EnterTree();
@@ -27,16 +24,16 @@ public abstract class Entity : SpriteMapObject, ITurnable
     {
         base._ExitTree();
     }
+    #endregion
 
-    public virtual void StartTurn()
-    {
-        ResetMovementPoints();
-    }
+    #region ITurnable
+    public virtual void StartTurn() { ResetMovementPoints(); }
+    public virtual void UpdateTurnObject() { }
+    #endregion
 
-    public virtual void UpdateTurnObject()
-    {
-        //CalculatePossiblePositions();
-        //Main.map?.UpdateHightligthDisplay(posible_positions_tile_cache);
-    }
-
+    #region ISelectable 
+    public virtual void HandleSelection() { }
+    public virtual void HandleBeingSelected() { }
+    public virtual void HandleUnselection() { }
+    #endregion
 }

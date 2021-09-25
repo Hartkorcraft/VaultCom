@@ -6,15 +6,35 @@ using static HartLib.Utils;
 
 public class PlayerPathfindingActivity : PlayerActivityBase
 {
+
+    public override void Start()
+    {
+        if (LogChangesInGodot) { GD.Print("Changed to player finding path action"); }
+    }
+
+    #region Helpers 
+    bool NoMouseable => Main.game_Manager?.Mouseover.Count == 0;
+    bool DiffrentLastMousePos => !player_character.lastMouseGridPos.Equals(Main.Mouse_Grid_Pos);
+    bool EmptyPathCache => player_character.path_positions_cache.Count == 0;
+    bool PathNotEmpty(List<PathFindingCell<TileType>> path) => (path != null && path.Count > 0);
+    bool PossiblePositionsContainPath(List<PathFindingCell<TileType>> path) => positions_cache.Contains(path[path.Count - 1].GridPos);
+    #endregion
+
     public override void DoPlayerActionProcess()
     {
         //Pathfinding
-        if (Main.game_Manager?.Mouseover.Count == 0 && player_character.MovementPoints > 0 && (!player_character.lastMouseGridPos.Equals(Main.Mouse_Grid_Pos) || player_character.path_positions_cache.Count == 0))
+        if (NoMouseable && player_character.MovementPoints > 0 && (DiffrentLastMousePos || EmptyPathCache))
         {
             Main.map?.PathfindingTiles.Clear();
-            var path = Main.map?.PathFinding.FindPath(player_character.GridPos, Main.Mouse_Grid_Pos, player_character.blocking_movement, collider_layer: 1, diagonals: true, big: false);
+            var path = Main.map?.PathFinding.FindPath(
+                startPos: player_character.GridPos,
+                endPos: Main.Mouse_Grid_Pos,
+                blockingTiles: player_character.blocking_movement,
+                collider_layer: 1,
+                diagonals: true,
+                big: false);
 
-            if (path != null && path.Count > 0 && positions_cache.Contains(path[path.Count - 1].GridPos))
+            if (PathNotEmpty(path) && PossiblePositionsContainPath(path))
             {
                 player_character.path_positions_cache.Clear();
                 var distance = 0;
@@ -37,20 +57,14 @@ public class PlayerPathfindingActivity : PlayerActivityBase
         }
     }
 
+    public override void UpdateCalculations()
+    {
+        positions_cache = Main.map?.PathFinding.FindPossibleSpaces(player_character.GridPos, player_character.MovementPoints, player_character.blocking_movement, 1);
+    }
+
     public override void ShowCurrentDisplay()
     {
         Main.map?.Update_Higthlight_Display(positions_cache);
-    }
-
-    public override void UpdateCalculations()
-    {
-        base.UpdateCalculations();
-        positions_cache = Main.map?.PathFinding.FindPossibleSpaces(player_character.GridPos, player_character.MovementPoints, player_character.blocking_movement, 1);
-        //player_character.CalculatePossiblePositions();
-    }
-    public override void Start()
-    {
-        GD.Print("Changed to player finding path action");
     }
 
     public PlayerPathfindingActivity(PlayerCharacter p) : base(p) { }
