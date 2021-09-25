@@ -4,89 +4,7 @@ using System.Collections.Generic;
 using HartLib;
 using static HartLib.Utils;
 
-public abstract class PlayerActivityBase
-{
-    protected PlayerCharacter player_character;
-
-    public abstract void DoPlayerAction();
-
-    public virtual void Start(PlayerCharacter p)
-    {
-        player_character = p;
-    }
-
-    public virtual void Exit() { }
-
-    public virtual void UpdateDisplay() { }
-
-    public virtual void ClearDisplay()
-    {
-        Main.map?.UpdateHightligthDisplay(null);
-    }
-
-    public PlayerActivityBase() { }
-}
-
-public class PlayerIdleActivity : PlayerActivityBase
-{
-    public override void DoPlayerAction()
-    {
-
-    }
-
-    public override void Start(PlayerCharacter p)
-    {
-        base.Start(p);
-        GD.Print("Changed to idle action");
-    }
-
-    public PlayerIdleActivity() : base() { }
-}
-
-public class PlayerPrimaryActivity : PlayerActivityBase
-{
-    public override void DoPlayerAction()
-    {
-
-    }
-
-    public override void UpdateDisplay()
-    {
-        Main.map?.UpdateHightligthDisplay(player_character.posible_positions_tile_cache, TileType.Transparent_Orange);
-    }
-
-    public override void Start(PlayerCharacter p)
-    {
-        base.Start(p);
-        GD.Print("Changed to primary action");
-    }
-
-    public PlayerPrimaryActivity() : base() { }
-}
-
-public class PlayerUseActivity : PlayerActivityBase
-{
-    public override void DoPlayerAction()
-    {
-
-    }
-
-    public override void UpdateDisplay()
-    {
-        Main.map?.UpdateHightligthDisplay(player_character.posible_positions_tile_cache, TileType.Red_Dot);
-    }
-
-    public override void Start(PlayerCharacter p)
-    {
-        base.Start(p);
-        GD.Print("Changed to use action");
-    }
-
-    public PlayerUseActivity() : base() { }
-}
-
-
-public class PlayerFindingPathActivity : PlayerActivityBase
+public class PlayerPathfindingActivity : PlayerActivityBase
 {
     public override void DoPlayerAction()
     {
@@ -130,7 +48,7 @@ public class PlayerFindingPathActivity : PlayerActivityBase
         GD.Print("Changed to player finding path action");
     }
 
-    public PlayerFindingPathActivity() : base() { }
+    public PlayerPathfindingActivity() : base() { }
 
 }
 

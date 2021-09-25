@@ -23,7 +23,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         }
     }
 
-    public static PlayerFindingPathActivity player_finding_path_activity = new PlayerFindingPathActivity();
+    public static PlayerPathfindingActivity player_finding_path_activity = new PlayerPathfindingActivity();
     public static PlayerPrimaryActivity player_primary_activity = new PlayerPrimaryActivity();
     public static PlayerUseActivity player_use_activity = new PlayerUseActivity();
     public static PlayerIdleActivity player_idle_activity = new PlayerIdleActivity();
