@@ -36,7 +36,7 @@ public class Map
         }
     }
 
-    public void UpdateHightligthDisplay(List<Vector2i> positions, TileType tileType = TileType.Transparent_Green)
+    public void Update_Higthlight_Display(List<Vector2i> positions, TileType tileType = TileType.Transparent_Green)
     {
         Main.map.HighlightTiles.Clear();
         if (positions != null)

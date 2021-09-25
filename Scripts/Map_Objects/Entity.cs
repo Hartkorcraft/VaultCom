@@ -8,11 +8,14 @@ public abstract class Entity : SpriteMapObject, ITurnable
 {
     public int MovementPointsCap { get; set; } = 5;
     public int MovementPoints { get; set; } = 5;
-    public List<Vector2i> path_positions_cache { get; protected set; } = new List<Vector2i>();
-    public List<Vector2i> posible_positions_tile_cache { get; protected set; } = new List<Vector2i>();
+    // public List<Vector2i> path_positions_cache { get; protected set; } = new List<Vector2i>();
+    // public List<Vector2i> posible_positions_tile_cache { get; protected set; } = new List<Vector2i>();
     //public List<Vector2i> posible_primary_actions_tile_cache { get; protected set; } = new List<Vector2i>();
 
     public void ResetMovementPoints() { MovementPoints = MovementPointsCap; }
+
+
+    public abstract void AddITurnableToGameManager();
 
     public override void _EnterTree()
     {
@@ -30,16 +33,10 @@ public abstract class Entity : SpriteMapObject, ITurnable
         ResetMovementPoints();
     }
 
-    public virtual void CalculatePossiblePositions()
+    public virtual void UpdateTurnObject()
     {
-        posible_positions_tile_cache = Main.map.PathFinding.FindPossibleSpaces(GridPos, MovementPoints, blocking_movement, 1);
-    }
-
-    public void UpdateTurnObject()
-    {
-        CalculatePossiblePositions();
+        //CalculatePossiblePositions();
         //Main.map?.UpdateHightligthDisplay(posible_positions_tile_cache);
     }
 
-    public abstract void AddITurnableToGameManager();
 }

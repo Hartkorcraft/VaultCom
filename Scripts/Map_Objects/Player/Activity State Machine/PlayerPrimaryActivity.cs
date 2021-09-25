@@ -7,23 +7,22 @@ using static HartLib.Utils;
 
 public class PlayerPrimaryActivity : PlayerActivityBase
 {
-    public override void DoPlayerAction()
+    public override void DoPlayerActionProcess()
     {
 
     }
 
-    public override void UpdateDisplay()
+    public override void ShowCurrentDisplay()
     {
-        Main.map?.UpdateHightligthDisplay(player_character.posible_positions_tile_cache, TileType.Transparent_Orange);
+        Main.map?.Update_Higthlight_Display(player_character.Get_Posible_Moves(), TileType.Transparent_Orange);
     }
 
-    public override void Start(PlayerCharacter p)
+    public override void Start()
     {
-        base.Start(p);
         GD.Print("Changed to primary action");
     }
 
-    public PlayerPrimaryActivity() : base() { }
+    public PlayerPrimaryActivity(PlayerCharacter p) : base(p) { }
 }
 
 

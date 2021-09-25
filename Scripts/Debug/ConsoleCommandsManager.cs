@@ -53,7 +53,6 @@ public class ConsoleCommandsManager
             GET_PLAYER_CHARACTER_INFO
         };
     }
-
     public bool HandleInput(string input)
     {
         string[] words = input.Trim().Split(' ');
@@ -83,7 +82,6 @@ public class ConsoleCommandsManager
         }
         return false;
     }
-
 
     public ConsoleCommandsManager(Debug_Manager _debug_Manager, DebugConsole _console)
     {

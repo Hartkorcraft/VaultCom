@@ -6,21 +6,20 @@ using static HartLib.Utils;
 
 public class PlayerUseActivity : PlayerActivityBase
 {
-    public override void DoPlayerAction()
+    public override void DoPlayerActionProcess()
     {
 
     }
 
-    public override void UpdateDisplay()
+    public override void ShowCurrentDisplay()
     {
-        Main.map?.UpdateHightligthDisplay(player_character.posible_positions_tile_cache, TileType.Red_Dot);
+        Main.map?.Update_Higthlight_Display(player_character.Get_Posible_Moves(), TileType.Red_Dot);
     }
 
-    public override void Start(PlayerCharacter p)
+    public override void Start()
     {
-        base.Start(p);
         GD.Print("Changed to use action");
     }
 
-    public PlayerUseActivity() : base() { }
+    public PlayerUseActivity(PlayerCharacter p) : base(p) { }
 }

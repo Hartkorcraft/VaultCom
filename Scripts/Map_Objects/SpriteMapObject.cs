@@ -7,14 +7,22 @@ using static HartLib.Utils;
 
 public class SpriteMapObject : MapObject, IMouseable
 {
-    public Area2D area2D { get; private set; }
-    public HashSet<TileType> blocking_movement { get; protected set; } = new HashSet<TileType>();
-
     public static event Action<SpriteMapObject> end_transition_event;
     public static event Action<GameState> moving_on_path_event;
     public static event Action<SpriteMapObject> mouse_enter_over_event;
     public static event Action<SpriteMapObject> mouse_exit_over_event;
 
+    private List<Vector2i> transition_positions = new List<Vector2i>();
+    [Export] private float Transition_Speed = 0.3f;
+    private bool transitioning;
+    public bool Transitioning
+    {
+        get { return transitioning; }
+        set { transitioning = value; }
+    }
+    public Area2D area2D { get; private set; }
+    public HashSet<TileType> blocking_movement { get; protected set; } = new HashSet<TileType>();
+    
     #region  ENTER_TREE READY ETC.
     public override void _EnterTree()
     {
@@ -35,14 +43,6 @@ public class SpriteMapObject : MapObject, IMouseable
     #endregion
 
     #region MOVEABLE 
-    private List<Vector2i> transition_positions = new List<Vector2i>();
-    [Export] private float Transition_Speed = 0.3f;
-    private bool transitioning;
-    public bool Transitioning
-    {
-        get { return transitioning; }
-        set { transitioning = value; }
-    }
 
     protected void Transition_Position_Lerp(float smooth = 0.3f, float clip_range = 1f)
     {

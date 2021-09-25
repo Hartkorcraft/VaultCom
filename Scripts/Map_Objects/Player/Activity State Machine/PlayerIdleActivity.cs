@@ -6,17 +6,16 @@ using static HartLib.Utils;
 
 public class PlayerIdleActivity : PlayerActivityBase
 {
-    public override void DoPlayerAction()
+    public override void DoPlayerActionProcess()
     {
 
     }
 
-    public override void Start(PlayerCharacter p)
+    public override void Start()
     {
-        base.Start(p);
         GD.Print("Changed to idle action");
     }
 
-    public PlayerIdleActivity() : base() { }
+    public PlayerIdleActivity(PlayerCharacter p) : base(p) { }
 }
 

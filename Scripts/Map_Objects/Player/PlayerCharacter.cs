@@ -19,14 +19,25 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
             if (current_action == value) { return; }
             previous_action = current_action;
             current_action = value;
-            current_action.Start(this);
+            current_action.Start();
+            if (current_action.Updated is false) { current_action.UpdateCalculations(); }
         }
     }
+    public bool CanSelect { get; set; } = true; //ISelectable
 
-    public static PlayerPathfindingActivity player_finding_path_activity = new PlayerPathfindingActivity();
-    public static PlayerPrimaryActivity player_primary_activity = new PlayerPrimaryActivity();
-    public static PlayerUseActivity player_use_activity = new PlayerUseActivity();
-    public static PlayerIdleActivity player_idle_activity = new PlayerIdleActivity();
+    public PlayerPathfindingActivity player_finding_path_activity { get; protected set; }
+    public PlayerPrimaryActivity player_primary_activity { get; protected set; }
+    public PlayerUseActivity player_use_activity { get; protected set; }
+    public PlayerIdleActivity player_idle_activity { get; protected set; }
+
+    public List<Vector2i> path_positions_cache { get; protected set; } = new List<Vector2i>();
+    //public List<Vector2i> posible_positions_tile_cache { get; protected set; } = new List<Vector2i>();
+
+    public List<Vector2i> Get_Posible_Moves()
+    {
+        player_finding_path_activity.UpdateCalculations();
+        return player_finding_path_activity.positions_cache;
+    }
 
     #region ENTER_TREE READY INPUT ETC
     public override void _EnterTree()
@@ -35,6 +46,12 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         number_of_player_characters++;
         AddIGetInfoableToGameManager();
         GridPos = new Vector2i(Position / new Vector2(Main.TILE_SIZE, Main.TILE_SIZE));
+
+        player_finding_path_activity = new PlayerPathfindingActivity(this);
+        player_primary_activity = new PlayerPrimaryActivity(this);
+        player_use_activity = new PlayerUseActivity(this);
+        player_idle_activity = new PlayerIdleActivity(this);
+
         Default_Action = player_finding_path_activity;
         UI.primary_button_pressed += TryDoPrimaryAction;
         UI.use_button_pressed += TryDoUseAction;
@@ -62,7 +79,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         {
             if (Game_Manager.CurrentSelection == this && Current_Action != null)
             {
-                Current_Action.DoPlayerAction();
+                Current_Action.DoPlayerActionProcess();
             }
         }
         lastMouseGridPos = Main.Mouse_Grid_Pos;
@@ -100,12 +117,11 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
     #endregion
 
     #region ISELECTABLE
-    public bool CanSelect { get; set; } = true;
 
     public virtual void HandleSelection()
     {
         Current_Action = Default_Action;
-        Current_Action.UpdateDisplay();
+        Current_Action.ShowCurrentDisplay();
         //Main.map?.UpdateHightligthDisplay(posible_positions_tile_cache);
     }
 
@@ -116,7 +132,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
 
     public virtual void HandleUnselection()
     {
-        Current_Action.ClearDisplay();
+        Current_Action.Clear_Hightlight_Display();
         Current_Action = player_idle_activity;
     }
     #endregion
@@ -135,9 +151,25 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
     }
     #endregion
 
+    // #region IMoveable
+    // // public virtual void CalculatePossiblePositions()
+    // // {
+    // //     posible_positions_tile_cache = Main.map?.PathFinding.FindPossibleSpaces(GridPos, MovementPoints, blocking_movement, 1);
+    // // }
+
+    // #endregion
+
+    public override void UpdateTurnObject()
+    {
+        base.UpdateTurnObject();
+        Current_Action.UpdateCalculations();
+    }
+
     public override void StartTurn()
     {
         base.StartTurn();
+        Set_Action_Updated_Flag_To_False();
+        //CalculatePossiblePositions();
         Current_Action = player_idle_activity;
     }
 
@@ -146,9 +178,18 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         if (previous_action != null) { return Current_Action = previous_action; }
         else { return Current_Action = Default_Action; }
     }
+
     public PlayerActivityBase ChangeToDefaultAction()
     {
         return Current_Action = Default_Action;
+    }
+
+    public void Set_Action_Updated_Flag_To_False()
+    {
+        player_idle_activity.Updated = false;
+        player_primary_activity.Updated = false;
+        player_use_activity.Updated = false;
+        player_finding_path_activity.Updated = false;
     }
 
     public void TryDoPrimaryAction()
@@ -157,7 +198,7 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         {
             if (Current_Action as PlayerPrimaryActivity is null) { Current_Action = player_primary_activity; }
             else { Current_Action = ChangeToDefaultAction(); }
-            Current_Action?.UpdateDisplay();
+            Current_Action?.ShowCurrentDisplay();
         }
     }
     public void TryDoUseAction()
@@ -166,14 +207,15 @@ public class PlayerCharacter : Entity, ISelectable, IContextable, IGetInfoable
         {
             if (Current_Action as PlayerUseActivity is null) { Current_Action = player_use_activity; }
             else { Current_Action = ChangeToDefaultAction(); }
-            Current_Action?.UpdateDisplay();
+            Current_Action?.ShowCurrentDisplay();
         }
     }
 
     protected override void EndTransition()
     {
         base.EndTransition();
-        Current_Action.UpdateDisplay();
+        Set_Action_Updated_Flag_To_False();
+        Current_Action.ShowCurrentDisplay();
     }
 
     public override void AddITurnableToGameManager()

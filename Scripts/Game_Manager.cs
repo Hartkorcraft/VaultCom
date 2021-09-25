@@ -21,6 +21,8 @@ public class Game_Manager : Node2D
     }
     public static HashSet<PlayerCharacter> GetPlayerInfoObjects() { return GetInfoObjectsOfType<PlayerCharacter>(); }
 
+    private static ISelectable currentSelection;
+
     public static event Action<GameState> changed_state_event;
     //public bool ContextMenuOpen { get { return Main.context_menu.Visible; } }
     //public bool ContextMenuSafeCheck { get { return Main.context_menu.SafeInput; } }
@@ -65,7 +67,6 @@ public class Game_Manager : Node2D
     #endregion
 
     #region SELECTION
-    private static ISelectable currentSelection;
     public static ISelectable CurrentSelection
     {
         get { return currentSelection; }
