@@ -12,6 +12,7 @@ public class ConsoleCommandsManager
     public static DebugCommand HELP;
     public static DebugCommand GET_PLAYER_CHARACTER_INFO;
     public static DebugCommand CLEAR_CONSOLE;
+    public static DebugCommand PRINT_LOGS;
 
     private void AddCommands()
     {
@@ -54,13 +55,19 @@ public class ConsoleCommandsManager
             console.Clear();
         });
 
+        PRINT_LOGS = new DebugCommand("print_logs", "prints logs", "print_log", () =>
+        {
+            console.OutputText(debug_Manager.GetLogDisplay);
+        });
+
         commandList = new List<object>
         {
             HELLO,
             ADD,
             HELP,
             GET_PLAYER_CHARACTER_INFO,
-            CLEAR_CONSOLE
+            CLEAR_CONSOLE,
+            PRINT_LOGS
         };
     }
     public bool HandleInput(string input)

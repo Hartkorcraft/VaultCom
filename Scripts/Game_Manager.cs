@@ -105,7 +105,7 @@ public class Game_Manager : Node2D
     #endregion
 
     #region TURN
-      public void StartPlayerTurn()
+    public void StartPlayerTurn()
     {
         foreach (ITurnable playerObject in PlayerTurnObjects) { playerObject.StartTurn(); }
         UpdateTurnObjects();
@@ -129,7 +129,7 @@ public class Game_Manager : Node2D
         }
     }
     #endregion
-    
+
     //TODO Put it in UI and add delegate 
     public void _on_Next_Turn_Button_pressed()
     {
@@ -154,6 +154,6 @@ public class Game_Manager : Node2D
             SetState(Previous_State);
             Main.map.PathfindingTiles.Clear();
         }
-        else { throw new Exception("Not transitioning?!"); }
+        else { GD.PrintErr("not transitioning!"); }
     }
 }

@@ -6,11 +6,13 @@ using static HartLib.Utils;
 
 public class Debug_Manager : Control
 {
+    public DebugConsole debugConsole { get; private set; }
 
     Label debugInfoLabel;
-    public DebugConsole debugConsole { get; private set; }
     Dictionary<string, DebugInfo> logs = new Dictionary<string, DebugInfo>(); // Use AddLog, DeleteLog, UpdateLog and ClearLogs()
     string debugLabelText = "";
+
+    public string GetLogDisplay => debugInfoLabel?.Text;
 
     public override void _EnterTree()
     {
@@ -50,7 +52,7 @@ public class Debug_Manager : Control
 
     public void UpdateLog(string name, string logText, bool display = true)
     {
-        if (logs.ContainsKey(name) is false) { throw new Exception("no log " + name); }
+        if (logs.ContainsKey(name) is false) { GD.PrintErr("no log " + name); }
         logs[name].LabelText = logText;
         logs[name].Display = display;
         UpdateLogsDisplay();
